@@ -1,5 +1,5 @@
 #ifndef LASTWEAPON_MINCOSTFLOW_HPP
-#define LASTWEAPON_MINCOSTFLOW_HPP
+#define LASTWEAPON_MINCOSTFLOW_HPP 1
 
 #include <algorithm>
 #include <cassert>
