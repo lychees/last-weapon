@@ -21,28 +21,28 @@
 
 ## リスト
 
-`#include <atcoder/all>` : 一括include
+`#include <lastweapon/all>` : 一括include
 
 ### データ構造
 
-- [`#include <atcoder/fenwicktree>`](./fenwicktree.html)
-- [`#include <atcoder/segtree>`](./segtree.html)
-- [`#include <atcoder/lazysegtree>`](./lazysegtree.html)
-- [`#include <atcoder/string>`](./string.html)
+- [`#include <lastweapon/fenwicktree>`](./fenwicktree.html)
+- [`#include <lastweapon/segtree>`](./segtree.html)
+- [`#include <lastweapon/lazysegtree>`](./lazysegtree.html)
+- [`#include <lastweapon/string>`](./string.html)
 
 ### 数学
 
-- [`#include <atcoder/math>`](./math.html)
-- [`#include <atcoder/convolution>`](./convolution.html)
-- 💻[`#include <atcoder/modint>`](./modint.html)
+- [`#include <lastweapon/math>`](./math.html)
+- [`#include <lastweapon/convolution>`](./convolution.html)
+- 💻[`#include <lastweapon/modint>`](./modint.html)
 
 ### グラフ
 
-- [`#include <atcoder/dsu>`](./dsu.html)
-- [`#include <atcoder/maxflow>`](./maxflow.html)
-- [`#include <atcoder/mincostflow>`](./mincostflow.html)
-- [`#include <atcoder/scc>`](./scc.html)
-- [`#include <atcoder/twosat>`](./twosat.html)
+- [`#include <lastweapon/dsu>`](./dsu.html)
+- [`#include <lastweapon/maxflow>`](./maxflow.html)
+- [`#include <lastweapon/mincostflow>`](./mincostflow.html)
+- [`#include <lastweapon/scc>`](./scc.html)
+- [`#include <lastweapon/twosat>`](./twosat.html)
 
 ## 付録
 
@@ -54,4 +54,4 @@
 
 ## ライセンス
 
-ヘッダファイル群(同梱の `atcoder` フォルダ以下)はCC0ライセンスで公開しています。詳しくは`atcoder/LICENSE`を参照してください。
+ヘッダファイル群(同梱の `atcoder` フォルダ以下)はCC0ライセンスで公開しています。詳しくは`lastweapon/LICENSE`を参照してください。

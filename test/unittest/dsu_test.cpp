@@ -1,10 +1,10 @@
-#include "atcoder/dsu"
+#include "lastweapon/dsu"
 
 #include <numeric>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 

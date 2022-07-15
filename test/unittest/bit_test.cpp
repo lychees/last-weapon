@@ -1,10 +1,10 @@
-#include "atcoder/internal_bit"
+#include "lastweapon/internal_bit"
 
 #include <numeric>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 

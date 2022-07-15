@@ -1,4 +1,4 @@
-#include "atcoder/lazysegtree"
+#include "lastweapon/lazysegtree"
 
 #include <algorithm>
 #include <string>
@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 struct starry {
     static int op_ss(int a, int b) { return std::max(a, b); }
     static int op_ts(int a, int b) { return a + b; }

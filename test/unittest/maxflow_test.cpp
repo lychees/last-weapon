@@ -1,4 +1,4 @@
-#include "atcoder/maxflow"
+#include "lastweapon/maxflow"
 #include "../utils/random.hpp"
 
 #include <numeric>
@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 
@@ -172,7 +172,7 @@ TEST(MaxflowTest, BoundUint) {
     edge_eq(e, g.get_edge(2));
 }
 
-// https://github.com/atcoder/ac-library/issues/1
+// https://github.com/lastweapon/ac-library/issues/1
 TEST(MaxflowTest, SelfLoop) {
     mf_graph<int> g(3);
     ASSERT_EQ(0, g.add_edge(0, 0, 100));
@@ -183,7 +183,7 @@ TEST(MaxflowTest, SelfLoop) {
 
 TEST(MaxflowTest, Invalid) {
     mf_graph<int> g(2);
-    // https://github.com/atcoder/ac-library/issues/5
+    // https://github.com/lastweapon/ac-library/issues/5
     EXPECT_DEATH(g.flow(0, 0), ".*");
     EXPECT_DEATH(g.flow(0, 0, 0), ".*");
 }

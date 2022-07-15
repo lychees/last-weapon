@@ -1,11 +1,11 @@
-#include "atcoder/twosat"
+#include "lastweapon/twosat"
 
 #include <numeric>
 #include "../utils/random.hpp"
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 

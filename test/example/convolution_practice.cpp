@@ -1,9 +1,9 @@
-#include <atcoder/convolution>
-#include <atcoder/modint>
+#include <lastweapon/convolution>
+#include <lastweapon/modint>
 #include <cstdio>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 using mint = modint998244353;
 

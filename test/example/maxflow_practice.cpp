@@ -1,8 +1,8 @@
-#include <atcoder/maxflow>
+#include <lastweapon/maxflow>
 #include <iostream>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     int n, m;

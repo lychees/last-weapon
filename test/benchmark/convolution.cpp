@@ -1,10 +1,10 @@
-#include "atcoder/convolution"
+#include "lastweapon/convolution"
 #include <iostream>
 
 #include "benchmark/benchmark.h"
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 using mint = modint998244353;
 
 void CONV_same_length(benchmark::State& state) {    

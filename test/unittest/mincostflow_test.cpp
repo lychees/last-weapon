@@ -1,5 +1,5 @@
-#include "atcoder/maxflow"
-#include "atcoder/mincostflow"
+#include "lastweapon/maxflow"
+#include "lastweapon/mincostflow"
 
 #include "../utils/random.hpp"
 
@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 
@@ -75,7 +75,7 @@ TEST(MincostflowTest, OutOfRange) {
     EXPECT_DEATH(g.slope(3, 3), ".*");
 }
 
-// https://github.com/atcoder/ac-library/issues/1
+// https://github.com/lastweapon/ac-library/issues/1
 TEST(MincostflowTest, SelfLoop) {
     mcf_graph<int, int> g(3);
     ASSERT_EQ(0, g.add_edge(0, 0, 100, 123));
@@ -95,7 +95,7 @@ TEST(MincostflowTest, SameCostPaths) {
 
 TEST(MincostflowTest, Invalid) {
     mcf_graph<int, int> g(2);
-    // https://github.com/atcoder/ac-library/issues/51
+    // https://github.com/lastweapon/ac-library/issues/51
     EXPECT_DEATH(g.add_edge(0, 0, -1, 0), ".*");
     EXPECT_DEATH(g.add_edge(0, 0, 0, -1), ".*");
 }

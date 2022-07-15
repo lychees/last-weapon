@@ -1,9 +1,9 @@
-#include <atcoder/twosat>
+#include <lastweapon/twosat>
 #include <iostream>
 #include <vector>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     int n, d;

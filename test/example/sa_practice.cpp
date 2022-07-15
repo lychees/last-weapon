@@ -1,10 +1,10 @@
-#include <atcoder/string>
+#include <lastweapon/string>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     static char buf[500'001];

@@ -1,11 +1,11 @@
-#include "atcoder/segtree"
+#include "lastweapon/segtree"
 
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 
 template <class S, S (*op)(S, S), S (*e)()> struct segtree_naive {
     int n;

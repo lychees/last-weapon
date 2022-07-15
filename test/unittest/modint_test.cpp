@@ -1,10 +1,10 @@
-#include "atcoder/modint"
+#include "lastweapon/modint"
 
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 
 ll gcd(ll a, ll b) {

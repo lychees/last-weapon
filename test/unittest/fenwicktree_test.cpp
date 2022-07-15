@@ -1,11 +1,11 @@
-#include "atcoder/fenwicktree"
-#include "atcoder/modint"
+#include "lastweapon/fenwicktree"
+#include "lastweapon/modint"
 
 #include <numeric>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 

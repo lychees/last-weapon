@@ -14,9 +14,9 @@ logger = getLogger(__name__)  # type: Logger
 
 class Expander:
     atcoder_include = re.compile(
-        r'#include\s*["<](atcoder/[a-z_]*(|.hpp))[">]\s*')
+        r'#include\s*["<](lastweapon/[a-z_]*(|.hpp))[">]\s*')
 
-    include_guard = re.compile(r'#.*ATCODER_[A-Z_]*_HPP')
+    include_guard = re.compile(r'#.*LASTWEAPON_[A-Z_]*_HPP')
 
     def is_ignored_line(self, line) -> bool:
         if self.include_guard.match(line):

@@ -1,8 +1,8 @@
-#include <atcoder/scc>
+#include <lastweapon/scc>
 #include <cstdio>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     int n, m;

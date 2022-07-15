@@ -5,11 +5,11 @@
 多くの問題では `modint998244353`, `modint1000000007`, `modint` のどれかを使えば十分で、以下のように使えます。
 
 ```cpp
-#include <atcoder/modint>
+#include <lastweapon/modint>
 #include <iostream>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 using mint = modint998244353;
 // or: typedef modint998244353 mint;
@@ -31,7 +31,7 @@ int main() {
 modがfixedでない場合は、`modint` を使用し以下のように書けます。
 
 ```cpp
-#include <atcoder/modint>
+#include <lastweapon/modint>
 #include <iostream>
 
 using namespace std;

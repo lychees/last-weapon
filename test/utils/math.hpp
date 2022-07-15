@@ -1,5 +1,5 @@
-#include "atcoder/internal_math"
-#include "atcoder/math"
+#include "lastweapon/internal_math"
+#include "lastweapon/math"
 
 #include <vector>
 

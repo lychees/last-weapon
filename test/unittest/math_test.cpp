@@ -1,10 +1,10 @@
-#include "atcoder/math"
+#include "lastweapon/math"
 
 #include <numeric>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using uint = unsigned int;
 using ll = long long;
 using ull = unsigned long long;

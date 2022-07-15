@@ -1,12 +1,12 @@
-#include "atcoder/convolution"
-#include "atcoder/modint"
+#include "lastweapon/convolution"
+#include "lastweapon/modint"
 
 #include <random>
 #include "../utils/random.hpp"
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using uint = unsigned int;
 using ll = long long;
 using ull = unsigned long long;
@@ -356,7 +356,7 @@ TEST(ConvolutionTest, ConvLLBound) {
     }
 }
 
-// https://github.com/atcoder/ac-library/issues/30
+// https://github.com/lastweapon/ac-library/issues/30
 TEST(ConvolutionTest, Conv641) {
     // 641 = 128 * 5 + 1
     const int MOD = 641;
@@ -371,7 +371,7 @@ TEST(ConvolutionTest, Conv641) {
     ASSERT_EQ(conv_naive<MOD>(a, b), convolution<MOD>(a, b));
 }
 
-// https://github.com/atcoder/ac-library/issues/30
+// https://github.com/lastweapon/ac-library/issues/30
 TEST(ConvolutionTest, Conv18433) {
     // 18433 = 2048 * 9 + 1
     const int MOD = 18433;

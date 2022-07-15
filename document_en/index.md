@@ -21,28 +21,28 @@
 
 ## List
 
-`#include <atcoder/all>` : include everything
+`#include <lastweapon/all>` : include everything
 
 ### Data Structures
 
-- [`#include <atcoder/fenwicktree>`](./fenwicktree.html)
-- [`#include <atcoder/segtree>`](./segtree.html)
-- [`#include <atcoder/lazysegtree>`](./lazysegtree.html)
-- [`#include <atcoder/string>`](./string.html)
+- [`#include <lastweapon/fenwicktree>`](./fenwicktree.html)
+- [`#include <lastweapon/segtree>`](./segtree.html)
+- [`#include <lastweapon/lazysegtree>`](./lazysegtree.html)
+- [`#include <lastweapon/string>`](./string.html)
 
 ### Math
 
-- [`#include <atcoder/math>`](./math.html)
-- [`#include <atcoder/convolution>`](./convolution.html)
-- 💻[`#include <atcoder/modint>`](./modint.html)
+- [`#include <lastweapon/math>`](./math.html)
+- [`#include <lastweapon/convolution>`](./convolution.html)
+- 💻[`#include <lastweapon/modint>`](./modint.html)
 
 ### Graphs
 
-- [`#include <atcoder/dsu>`](./dsu.html)
-- [`#include <atcoder/maxflow>`](./maxflow.html)
-- [`#include <atcoder/mincostflow>`](./mincostflow.html)
-- [`#include <atcoder/scc>`](./scc.html)
-- [`#include <atcoder/twosat>`](./twosat.html)
+- [`#include <lastweapon/dsu>`](./dsu.html)
+- [`#include <lastweapon/maxflow>`](./maxflow.html)
+- [`#include <lastweapon/mincostflow>`](./mincostflow.html)
+- [`#include <lastweapon/scc>`](./scc.html)
+- [`#include <lastweapon/twosat>`](./twosat.html)
 
 ## Appendix
 
@@ -55,4 +55,4 @@
 
 ## License
 
-The header files in `atcoder` folder are licensed under a CC0 license. See `atcoder/LICENSE` for further details.
+The header files in `atcoder` folder are licensed under a CC0 license. See `lastweapon/LICENSE` for further details.

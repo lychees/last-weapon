@@ -1,10 +1,10 @@
-#include "atcoder/internal_type_traits"
+#include "lastweapon/internal_type_traits"
 
 #include <type_traits>
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using namespace std;
 using ll = long long;
 using ull = unsigned long long;

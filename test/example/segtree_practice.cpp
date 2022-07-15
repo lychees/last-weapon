@@ -1,9 +1,9 @@
-#include <atcoder/segtree>
+#include <lastweapon/segtree>
 #include <cstdio>
 #include <vector>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int op(int a, int b) { return max(a, b); }
 

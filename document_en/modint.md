@@ -5,11 +5,11 @@ It is the struct that treats the modular arithmetic. All the remaining parts of 
 For most of the problems, it is sufficient to use `modint998244353`, `modint1000000007`, or `modint`, which can be used as follows.
 
 ```cpp
-#include <atcoder/modint>
+#include <lastweapon/modint>
 #include <iostream>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 using mint = modint998244353;
 // or: typedef modint998244353 mint;
@@ -31,7 +31,7 @@ int main() {
 If the mod is not fixed, you can use `modint` as follows.
 
 ```cpp
-#include <atcoder/modint>
+#include <lastweapon/modint>
 #include <iostream>
 
 using namespace std;

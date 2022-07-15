@@ -1,4 +1,4 @@
-#include "atcoder/string"
+#include "lastweapon/string"
 
 #include <algorithm>
 #include <numeric>
@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 using ll = long long;
 using ull = unsigned long long;
 

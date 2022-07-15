@@ -2,7 +2,7 @@
 
 ## 動作環境
 
-- `ATCODER_`で始まる名前のマクロを使わないでください。
+- `LASTWEAPON_`で始まる名前のマクロを使わないでください。
 - 多くの環境で動くように作っていますが、C++標準からある程度の拡張機能を要求します。具体的には以下のことを仮定します。
   - `__int128 / unsigned __int128(g++, clang++)` か `_mul128 / _umul128(Visual Studio)` が使えること
   - `__builtin_(ctz/ctzll/clz/clzll/popcount)(g++, clang++)` か `_BitScan(Forward/Reverse)(Visual Studio)` が使えること
@@ -66,8 +66,8 @@ vector<int> sa = suffix_array(v);
 構造体、例えば`scc_graph` などは、サンプルのように
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 int main() {
     int n;
@@ -80,8 +80,8 @@ int main() {
 といった宣言方法だけでなく、次のように初期化なしで宣言することも出来ます。
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 scc_graph g;
 
@@ -98,8 +98,8 @@ int main() {
 となります。また、構造体に後から代入することも出来ます。
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 scc_graph g;
 

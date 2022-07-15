@@ -1,4 +1,4 @@
-#include "atcoder/lazysegtree"
+#include "lastweapon/lazysegtree"
 
 #include "../utils/random.hpp"
 
@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace atcoder;
+using namespace lastweapon;
 
 // time manager
 struct time_manager {

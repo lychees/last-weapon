@@ -1,8 +1,8 @@
-#include <atcoder/mincostflow>
+#include <lastweapon/mincostflow>
 #include <iostream>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 const long long BIG = 1'000'000'000;
 

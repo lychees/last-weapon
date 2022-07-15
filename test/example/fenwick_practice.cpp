@@ -1,8 +1,8 @@
-#include <atcoder/fenwicktree>
+#include <lastweapon/fenwicktree>
 #include <cstdio>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     int n, q;

@@ -1,9 +1,9 @@
-#include <atcoder/string>
+#include <lastweapon/string>
 #include <string>
 #include <vector>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     string s = "missisippi";

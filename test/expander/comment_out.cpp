@@ -1,9 +1,9 @@
-// #include <atcoder/dsu>
-/* #include <atcoder/dsu> */
-/* #include <atcoder/dsu>
+// #include <lastweapon/dsu>
+/* #include <lastweapon/dsu> */
+/* #include <lastweapon/dsu>
 */
 
-namespace atcoder {
+namespace lastweapon {
     struct dsu {
 
     };

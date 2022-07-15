@@ -1,8 +1,8 @@
-#include <atcoder/math>
+#include <lastweapon/math>
 #include <cstdio>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 int main() {
     int t;

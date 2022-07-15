@@ -2,7 +2,7 @@
 
 ## Environments
 
-- Do not use the macro beginning with `ATCODER_`.
+- Do not use the macro beginning with `LASTWEAPON_`.
 - Although we aimed to make it work in many environments, it requires some C++ extension. We assume the following.
   - `__int128 / unsigned __int128(g++, clang++)` or `_mul128 / _umul128(Visual Studio)` works.
   - `__builtin_(ctz/ctzll/clz/clzll/popcount)(g++, clang++)` or `_BitScan(Forward/Reverse)(Visual Studio)` works.
@@ -63,8 +63,8 @@ vector<int> sa = suffix_array(v);
 The structs like `scc_graph` can be declared not only like the former code, but also like the latter code without initialization.
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 int main() {
     int n;
@@ -75,8 +75,8 @@ int main() {
 ```
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 scc_graph g;
 
@@ -93,8 +93,8 @@ If it is declared in the latter way, the behavior (of the default constructor) i
 You can also assign a value to the struct later.
 
 ```cpp
-#include <atcoder/scc>;
-using namespace atcoder;
+#include <lastweapon/scc>;
+using namespace lastweapon;
 
 scc_graph g;
 

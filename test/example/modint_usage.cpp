@@ -1,8 +1,8 @@
-#include <atcoder/modint>
+#include <lastweapon/modint>
 #include <cstdio>
 
 using namespace std;
-using namespace atcoder;
+using namespace lastweapon;
 
 using mint = static_modint<11>;
 int main() {
