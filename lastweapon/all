@@ -13,3 +13,4 @@
 #include "lastweapon/io"
 #include "lastweapon/bignum"
 #include "lastweapon/geometry"
+#include "lastweapon/sam"

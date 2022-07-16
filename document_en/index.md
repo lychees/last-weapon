@@ -25,24 +25,33 @@
 
 ### Data Structures
 
+- [`#include <lastweapon/dsu>`](./dsu.html)
 - [`#include <lastweapon/fenwicktree>`](./fenwicktree.html)
 - [`#include <lastweapon/segtree>`](./segtree.html)
 - [`#include <lastweapon/lazysegtree>`](./lazysegtree.html)
-- [`#include <lastweapon/string>`](./string.html)
 
 ### Math
 
 - [`#include <lastweapon/math>`](./math.html)
 - [`#include <lastweapon/convolution>`](./convolution.html)
-- 💻[`#include <lastweapon/modint>`](./modint.html)
+- [`#include <lastweapon/modint>`](./modint.html)
 
 ### Graphs
 
-- [`#include <lastweapon/dsu>`](./dsu.html)
 - [`#include <lastweapon/maxflow>`](./maxflow.html)
 - [`#include <lastweapon/mincostflow>`](./mincostflow.html)
 - [`#include <lastweapon/scc>`](./scc.html)
 - [`#include <lastweapon/twosat>`](./twosat.html)
+
+### Strings
+- [`#include <lastweapon/string>`](./string.html)
+- [`#include <lastweapon/sam>`](./sam.html)
+
+### Geometry
+- [`#include <lastweapon/geometry>`](./geometry.html)
+
+## MISC
+- [`#include <lastweapon/bignum>`](./bignum.html)
 
 ## Appendix
 
