@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument('--tag', help='Library version', required=True)
     opts = parser.parse_args()
 
-    langs = ['en', 'ja']
+    langs = ['en']
     for lang in langs:
         logger.info('start converting, lang={}'.format(lang))
         base_dir : Path = Path('..') / 'document_{}'.format(lang)        
