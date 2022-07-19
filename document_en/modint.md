@@ -258,5 +258,3 @@ using modint = dynamic_modint<-1>;
 ```
 
 ## @{keyword.examples}
-
-@{example.modint_usage}

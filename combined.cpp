@@ -1,11 +1,4 @@
 
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-#include <string>
-#include <vector>
-
-
 /*
     This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
     Template Date: 2022.6.21
@@ -284,142 +277,53 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 
-
-namespace lastweapon {
-
-template <size_t N, size_t Z> struct sam {
-    int trans[N][Z], par[N], len[N], pos[N], tot, tail;
-    char s[N]; VI adj[N]; int rt[N], dp[N], z;
-
-#define v trans[u][c]
-#define p par[u]
-#define pp par[uu]
-
-    sam() {
-        tot = 0; tail = new_node();
-    }
-
-    inline int new_node(){
-        RST(trans[tot]);
-        return tot++;
-    }
-
-    inline int new_node(int u){
-        CPY(trans[tot], trans[u]); par[tot] = par[u]; pos[tot] = pos[u];
-        return tot++;
-    }
-
-    inline int h(int u){
-        return len[u] - len[p];
-    }
-
-    int Ext(int c){
-        int u = tail, uu = new_node(); len[uu] = len[u] + 1;
-        while (u && !v) v = uu, u = p;
-        if (!u && !v) v = uu, pp = 0;
-        else{
-            if (len[v] == len[u] + 1) pp = v;
-            else{
-                int _v = v, vv = new_node(_v); len[vv] = len[u] + 1; par[_v] = pp = vv;
-                while (u && v == _v) v = vv, u = p;
-                if (!u && v == _v) v = vv;
-            }
-        }
-        return tail = uu;
-    }
-
-#undef c
-#undef p
-#undef pp
-#undef v
-
-};
-}  // namespace lastweapon
-
 using namespace std;
-using namespace lastweapon;
 
-const int N = int(4e5) + 9, Z = 26;
-
-namespace Chairman_Tree {
-#define lx c[0][x]
-#define rx c[1][x]
-#define ly c[0][y]
-#define ry c[1][y]
-#define lz c[0][z]
-#define rz c[1][z]
-#define ml ((l+r)>>1)
-#define mr (ml+1)
-#define lc lx, l, ml
-#define rc rx, mr, r
-    const int NN = 100*N;
-    int c[2][NN]; int tot;
-    int a, b;
-    int new_node() {
-        ++tot;
-        return tot;
-    }
-
-    void Init(int &x, int l, int r, const int p) {
-        x = new_node();
-        if (l < r) {
-            if (p < mr) Init(lc, p);
-            else Init(rc, p);
-        }
-    }
-
-    int Merge(int x, int y) {
-        if (!x || !y) return x | y;
-        int z = new_node();
-        lz = Merge(lx, ly);
-        rz = Merge(rx, ry);
-        return z;
-    }
-
-    bool Query(int x, int l, int r, const int a, const int b) {
-        if (!x || b < l || r < a) return 0;
-        if (a <= l && r <= b) return 1;
-        return Query(lc, a, b) || Query(rc, a, b);
-    }
-} using namespace Chairman_Tree;
-
-sam<N, Z> S;
-char s[N]; VI adj[N];
-int rt[N], dp[N], z;
-int n;
-
-void dfs(int u = 0) {
-    for (auto v: adj[u]) {
-        dfs(v);
-        rt[u] = Merge(rt[u], rt[v]);
-    }
-}
-
-void gao(int u = 0, int w = 0) {
-    checkMax(z, dp[u]);
-    for (auto v: adj[u]) {
-        if (!u || Query(rt[w], 0, n-1, S.pos[v] - S.len[v] + S.len[w], S.pos[v] - 1)) {
-            dp[v] = dp[w] + 1;
-            gao(v, v);
-        } else {
-            dp[v] = dp[w];
-            gao(v, w);
-        }
-    }
-}
+const int N = int(2e5) + 9;
+set<int> F;
+int bb[N];
+int ans[N]; int min_b, max_a;
+VI del[N];
+int n, m;
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
 
-    RD(n); RS(s);
-    REP(i, n) {
-        S.Ext(s[i] - 'a'); S.pos[S.tail] = i;
-        Init(rt[S.tail], 0, n-1, i);
+    RD(n, m); max_a = 0; min_b = INF; DO(n) {
+        int a, b; RD(a, b); --a; --b;
+        checkMax(bb[a], b);
+        checkMin(min_b, b);
+        checkMax(max_a, a);
     }
-    FOR(u, 1, S.tot) adj[S.par[u]].PB(u);
+    F.insert(0);
 
-	dfs(); gao();
-	cout << z << endl;
+    int rb = 0;
+    REP(i, m) {
+        checkMax(rb, bb[i]);
+
+        //cout << i << " "<< rb << endl;
+
+        if (rb >=i+1 ) {
+            del[rb - i-1].PB(i+1);
+            //cout << " "<< rb << " " <<rb-i << " "<< i+1 << endl;
+        }
+
+
+    }
+
+
+    DWN_1(i, m, 1) {
+
+        if (m-i <= min_b) F.insert(m-i);
+        // cout << *F.begin() + (i-1) << " " <<  max_a << endl;
+        while (!F.empty() && *F.begin() + (i-1) < max_a) F.erase(*F.begin());
+        for (auto d: del[i]) if (CTN(F, d)) F.erase(F.find(d));
+
+        ans[i] = SZ(F);
+    }
+
+    REP_1(i, m) printf("%d ", ans[i]);
+    cout << endl;
 }

@@ -1,14 +1,3 @@
-# half-plane
-
-It solves half plane problems.
-
-**@{keyword.complexity}**
-
-## @{keyword.examples}
-
-- [https://icpc.kattis.com/problems/domes](https://icpc.kattis.com/problems/domes)
-
-[cpp]
 #include <lastweapon/geometry>
 using namespace lastweapon::CG;
 
@@ -33,5 +22,3 @@ int main(){
 
     printf("%.9f\n", getArea(getHPI(H))/2);
 }
-
-[/cpp]

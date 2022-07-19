@@ -13,6 +13,8 @@
     segtree_practice = "https://atcoder.jp/contests/practice2/tasks/practice2_j"
     lazyseg_practice1 = "https://atcoder.jp/contests/practice2/tasks/practice2_k"
     lazyseg_practice2 = "https://atcoder.jp/contests/practice2/tasks/practice2_l"
+    domes = "https://icpc.kattis.com/problems/domes"
+    Luogu3829 = "https://www.luogu.com.cn/problem/P3829"
 
     # usage
     modint_usage = ""

@@ -65,7 +65,6 @@ def convert(md_statement: str, base_dir: Path, tag: str) -> str:
         'md_in_html',
     ], tab_length=2)
 
-
     return html_head + html_body.format(statement)
 
 
@@ -86,7 +85,7 @@ if __name__ == "__main__":
 
         for md_file in base_dir.glob('*.md'):
             logger.info('convert {}'.format(md_file))
-            statement = convert(open(md_file).read(), base_dir, opts.tag)
+            statement = convert(open(md_file, encoding="utf-8").read(), base_dir, opts.tag)
 
             html_file = base_dir / (md_file.stem + '.html')
             with open(html_file, 'w') as f:
