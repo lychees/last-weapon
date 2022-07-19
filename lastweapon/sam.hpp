@@ -1,12 +1,6 @@
 #ifndef LASTWEAPON_SAM_HPP
 #define LASTWEAPON_SAM_HPP 1
 
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-#include <string>
-#include <vector>
-
 #include "lastweapon/io"
 
 namespace lastweapon {

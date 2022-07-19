@@ -15,6 +15,7 @@
     lazyseg_practice2 = "https://atcoder.jp/contests/practice2/tasks/practice2_l"
     domes = "https://icpc.kattis.com/problems/domes"
     Luogu3829 = "https://www.luogu.com.cn/problem/P3829"
+    Luogu3804 = "https://www.luogu.com.cn/problem/P3804"
 
     # usage
     modint_usage = ""
