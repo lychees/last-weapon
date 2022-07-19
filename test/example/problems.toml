@@ -16,6 +16,7 @@
     domes = "https://icpc.kattis.com/problems/domes"
     Luogu3829 = "https://www.luogu.com.cn/problem/P3829"
     Luogu3804 = "https://www.luogu.com.cn/problem/P3804"
+    Luogu2408 = "https://www.luogu.com.cn/problem/P2408"
 
     # usage
     modint_usage = ""

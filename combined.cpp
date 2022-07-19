@@ -1,10 +1,4 @@
 
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-#include <string>
-#include <vector>
-
 
 /*
     This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
@@ -287,10 +281,10 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
 
 namespace lastweapon {
 
-template <size_t N, size_t Z> struct sam {     
+template <size_t N, size_t Z> struct sam {
     int trans[N][Z], par[N], len[N], pos[N], tot, tail;
     char s[N]; VI adj[N]; int rt[N], dp[N], z;
- 
+
 #define v trans[u][c]
 #define p par[u]
 #define pp par[uu]
@@ -298,21 +292,21 @@ template <size_t N, size_t Z> struct sam {
     sam() {
         tot = 0; tail = new_node();
     }
- 
+
     inline int new_node(){
         RST(trans[tot]);
         return tot++;
     }
- 
+
     inline int new_node(int u){
         CPY(trans[tot], trans[u]); par[tot] = par[u]; pos[tot] = pos[u];
         return tot++;
     }
- 
+
     inline int h(int u){
         return len[u] - len[p];
     }
- 
+
     int Ext(int c){
         int u = tail, uu = new_node(); len[uu] = len[u] + 1;
         while (u && !v) v = uu, u = p;
@@ -339,28 +333,19 @@ template <size_t N, size_t Z> struct sam {
 using namespace lastweapon;
 const int N = int(2e6) + 9, Z = 26;
 
-sam<N,Z> S; char s[N]; int cnt[N];
+sam<N,Z> S; char s[N]; int n;
 VI adj[N]; LL z;
-
-void dfs(int u = 0) {
-    for (auto v: adj[u]) {
-        dfs(v);
-        cnt[u] += cnt[v];
-    }
-    if (cnt[u] > 1) {
-        checkMax(z, (LL)cnt[u] * S.len[u]);
-    }
-}
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
 
-    RS(s); int n = strlen(s); REP(i, n) {
-        S.Ext(s[i] - 'a'); cnt[S.tail] = 1;
+    RD(n); RS(s);
+    REP(i, n) {
+        S.Ext(s[i] - 'a');
     }
-    FOR(u, 1, S.tot) adj[S.par[u]].PB(u);
-    dfs();
+    FOR(u, 1, S.tot) z += S.len[u] - S.len[S.par[u]];
     cout << z << endl;
 }
+

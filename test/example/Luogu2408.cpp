@@ -5,13 +5,6 @@ const int N = int(2e6) + 9, Z = 26;
 sam<N,Z> S; char s[N]; int cnt[N];
 VI adj[N]; LL z;
 
-void dfs(int u = 0) {
-    z += S.len[u] - S.len[S.par[u]];
-    for (auto v: adj[u]) {
-        dfs(v);
-    }
-}
-
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
@@ -21,7 +14,6 @@ int main() {
     REP(i, n) {
         S.Ext(s[i] - 'a');
     }
-    FOR(u, 1, S.tot) adj[S.par[u]].PB(u);
-    dfs();
+    FOR(u, 1, S.tot) z += S.len[u] - S.len[S.par[u]];
     cout << z << endl;
 }
