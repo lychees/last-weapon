@@ -5,7 +5,7 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 
 ## Reference
 ### Template
-- [(https://github.com/lychees/ac-library) ]((https://github.com/lychees/ac-library) )
+- [https://github.com/lychees/ac-library)](https://github.com/lychees/ac-library)
 - [https://github.com/not522/ac-library-python/](https://github.com/not522/ac-library-python/)
 - [https://github.com/hos-lyric/libra](https://github.com/hos-lyric/libra)
 - [https://github.com/kth-competitive-programming/kactl](https://github.com/kth-competitive-programming/kactl)

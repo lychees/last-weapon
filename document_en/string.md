@@ -67,8 +67,27 @@ Given a string of length $n$, it returns the array of length $n$, such that the 
 
 - $O(n)$
 
-## @{keyword.examples}
+### @{keyword.examples}
 
 @{example.sa_usage}
 
 @{example.sa_practice}
+
+## KMP
+
+TODO ...
+
+**@{keyword.constraints}**
+
+**@{keyword.complexity}**
+
+- $O(n)$
+
+### @{keyword.examples}
+
+## Manacher
+
+### @{keyword.examples}
+
+@{example.Luogu3805}
+

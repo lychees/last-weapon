@@ -1,11 +1,7 @@
 #ifndef LASTWEAPON_STRING_HPP
 #define LASTWEAPON_STRING_HPP 1
 
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-#include <string>
-#include <vector>
+#include "lastweapon/io"
 
 namespace lastweapon {
 
@@ -321,12 +317,11 @@ template <class T> std::vector<int> manacher(const std::vector<T>& ss) {
 
 std::vector<int> manacher(const std::string& s) {
     int n = int(s.size());
-    std::vector<int> s2(n);
+    std::vector<int> ss(n);
     for (int i = 0; i < n; i++) {
-        s2[i] = s[i];
+        ss[i] = s[i];
     }
-   // std::cout << "??" << std::endl;
-    return manacher(s2);
+    return manacher(ss);
 }
 
 }  // namespace lastweapon
