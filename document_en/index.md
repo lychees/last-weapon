@@ -43,6 +43,7 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 - [`#include <lastweapon/fenwicktree>`](./fenwicktree.html)
 - [`#include <lastweapon/segtree>`](./segtree.html)
 - [`#include <lastweapon/lazysegtree>`](./lazysegtree.html)
+- [`#include <lastweapon/splay>`](./splay.html)
 
 ### Math
 

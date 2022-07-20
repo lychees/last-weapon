@@ -18,6 +18,7 @@
     Luogu3804 = "https://www.luogu.com.cn/problem/P3804"
     Luogu3805 = "https://www.luogu.com.cn/problem/P3805"
     Luogu2408 = "https://www.luogu.com.cn/problem/P2408"
+    SPOJ_GSS6 = "https://www.spoj.com/problems/GSS6/"
 
     # usage
     modint_usage = ""

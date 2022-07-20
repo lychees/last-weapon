@@ -14,3 +14,4 @@
 #include "lastweapon/bignum"
 #include "lastweapon/geometry"
 #include "lastweapon/sam"
+#include "lastweapon/splay"

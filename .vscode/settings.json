@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "vector": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "functional": "cpp"
     }
 }
