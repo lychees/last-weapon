@@ -85,6 +85,8 @@ TODO ...
 
 ### @{keyword.examples}
 
+@{example.Luogu3375}
+
 ## Manacher
 
 ### @{keyword.examples}
