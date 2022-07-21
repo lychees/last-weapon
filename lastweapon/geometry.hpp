@@ -5,6 +5,11 @@
 
 namespace lastweapon {
 
+    inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
+    inline DB cot(DB x){return 1./tan(x);};
+    inline DB sec(DB x){return 1./cos(x);};
+    inline DB csc(DB x){return 1./sin(x);};
+
 namespace CG {
 
 #define cPo const Po&
