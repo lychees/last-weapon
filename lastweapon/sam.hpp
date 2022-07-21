@@ -7,13 +7,16 @@ namespace lastweapon {
 
 template <size_t N, size_t Z> struct sam {     
     int trans[N][Z], par[N], len[N], pos[N], tot, tail;
-    char s[N]; VI adj[N]; int rt[N], dp[N], z;
- 
+    
 #define v trans[u][c]
 #define p par[u]
 #define pp par[uu]
 
     sam() {
+        init();
+    }
+
+    void init() {
         tot = 0; tail = new_node();
     }
  

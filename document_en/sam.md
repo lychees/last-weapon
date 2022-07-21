@@ -9,3 +9,5 @@
 @{example.Luogu3804}
 
 @{example.Luogu2408}
+
+@{example.SPOJ_LCS2}

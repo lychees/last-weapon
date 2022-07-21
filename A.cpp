@@ -1,40 +1,44 @@
-#include <lastweapon/bignum>
-#include <lastweapon/acm>
+#include <lastweapon/sam>
 using namespace lastweapon;
 
-const int N = 51, Z = 50, AN = 101;
-map<char, int> o; char s[N];
-bignum dp[N][AN];
+const int N = int(2e5) + 9, Z = 26;
+char str[N];
 
-int ctoi(char c) {
-    return o[c];
-}
-
-#define acm acm<AN,Z,ctoi>
-struct my_acm : public acm {
-    void build(){
-        acm::build();
-        FOR(u, 1, tot) cnt[u] += cnt[fail[u]];
-    }
-    bignum run(int n, int z) {
+#define sam sam<N,Z>
+#define c (*cur - 'a')
 #define v trans[u][c]
-        dp[0][0] = 1; REP(i, n) {
-            REP(u, tot) REP(c, z) if (!cnt[v]) {
-                dp[i+1][v] += dp[i][u];
+#define p par[u]
+#define lenn C
+
+struct my_sam : public sam {
+    void init(){
+        RS(str); REP_S(cur, str) Ext(c);
+    }
+    void run() {
+        static int C[N], Q[N]; //RST(C);
+        REP(i, tot) ++C[len[i]];
+        REP_1(i, len[tail]) C[i] += C[i-1];
+        REP(i, tot) Q[--C[len[i]]] = i;
+
+
+        while (~scanf("%s", str)){
+            fill(lenn, lenn+tot, 0); int u = 0, l = 0; REP_S(cur, str){
+                while (u && !v) l = len[u = p];
+                if (u = v) checkMax(lenn[u], ++l);
+            }
+            DWN(i, tot, 1){
+                int u = Q[i]; checkMax(lenn[p], lenn[u]);
+                checkMin(len[u], lenn[u]);
             }
         }
-        return accumulate(dp[n], dp[n]+tot, bignum(0));
+        cout << *max_element(len+1, len+1+tot) << endl;
     }
-};
-
-my_acm A;
+} S;
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
 
-    int z, n, m; RD(z, n, m); REP(i, z) o[RC()] = i;
-    A.init(); DO(m) A.insert(RS(s)); A.build();
-    cout << A.run(n, z) << endl;
+    S.init(); S.run();
 }
