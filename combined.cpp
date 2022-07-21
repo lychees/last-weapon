@@ -279,218 +279,78 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
 }
 
 
-#ifdef _MSC_VER
-#include <intrin.h>
-#endif
-
 namespace lastweapon {
 
-namespace internal {
+template <size_t N, size_t Z> struct acm {
+    int trans[N][Z], fail[N], cnt[N]; int Q[N], cz, op, tot;
 
-int ceil_pow2(int n) {
-    int x = 0;
-    while ((1U << x) < (unsigned int)(n)) x++;
-    return x;
-}
+    ACM() {
+        init();
+    }
 
-constexpr int bsf_constexpr(unsigned int n) {
-    int x = 0;
-    while (!(n & (1 << x))) x++;
-    return x;
-}
+    void init() {
+        tot = 0; new_node();
+    }
 
-int bsf(unsigned int n) {
-#ifdef _MSC_VER
-    unsigned long index;
-    _BitScanForward(&index, n);
-    return index;
-#else
-    return __builtin_ctz(n);
-#endif
-}
+    inline int new_node(){
+        RST(trans[tot]), fail[tot] = cnt[tot] = 0;
+        return tot++;
+    }
 
-}  // namespace internal
+#define v trans[u][c]
+#define f trans[fail[u]][c]
 
+    void build(){
+        cz = op = 0; int u = 0; REP(c, Z) if (v) Q[op++] = v;
+        while (cz < op){
+            u = Q[cz++]; REP(c, Z) {
+                if (v) fail[Q[op++] = v] = f;
+                else v = f;
+            }
+        }
+    }
+
+    void insert(char str[]){
+        int u = 0; REP_S(cur, str) {
+            char c = *cur - 'a';
+            if (!v) v = new_node();
+            u = v;
+        }
+        ++cnt[u];
+    }
+
+#define vis Q
+    int run(char str[]){
+        int z = 0; int t, u = 0; fill(vis, vis + tot, 0);
+        REP_S(cur, str){
+            char c = *cur - 'a';
+            for (t=u=v;t&&!vis[t];t=fail[t]) {
+                z += cnt[t];
+                vis[t] = 1;
+            }
+        }
+        return z;
+    }
+#undef vis
+
+#undef f
+#undef v
+};
 }  // namespace lastweapon
 
-
-namespace lastweapon {
-
-namespace splay {
-
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-struct node {
-
-    static node *NIL; node *c[2], *p;
-    int sz; S d;
-
-#define NIL node::NIL
-#define l c[0]
-#define r c[1]
-#define lx x->l
-#define rx x->r
-#define px x->p
-#define ly y->l
-#define ry y->r
-#define py y->p
-
-    node(S s = e()){d=e();}
-    inline void reset(S s){l=r=p=NIL,d=s;sz=1;}
-
-    inline void upd(){
-        assert(this != NIL);
-        sz = l->sz + 1 + r->sz;
-        op(d, l->d, r->d);
-    }
-    inline int sgn(){return p->r==this;}
-    inline void setc(int d,node*x){c[d]=x,px=this;}
-    inline void setl(node*x){setc(0,x);}
-    inline void setr(node*x){setc(1,x);}
-
-    inline void rot(int d){
-        node*y=p,*z=py;z->setc(y->sgn(),this);
-        y->setc(d,c[!d]),setc(!d,y),y->upd();
-    }
-    inline void rot(){rot(sgn());}
-
-
-    inline node* splay(node*t){
-        while (p!=t) rot(); upd();
-        return this;
-    }
-
-    /*
-    inline node*splay(node*t){
-        int a,b;while(p!=t){
-            if (p->p==t){rot();break;}
-            else a=sgn(),b=p->sgn(),(a^b?this:p)->rot(a),rot(b);
-        }
-        upd();
-        return this;
-    }*/
-};
-
-
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-struct splay {
-
-#define node node<S, op, e>
-
-    std::vector<node> d;
-    int n; node* rt;
-
-    splay() : splay(0) {}
-    explicit splay(int n) : splay(std::vector<S>(n, e())) {}
-    explicit splay(const std::vector<S>& a) : n(int(a.size())) {
-        rt = new node(); rt->reset(0);
-        REP(i, n) {
-            node* t = new node();
-            t->reset(a[i]);
-            t->setl(rt); t->upd();
-            rt = t;
-        }
-        node* t = new node();
-        t->reset(0);
-        t->setl(rt); t->upd();
-        rt = t;
-    }
-
-    node *select(int k, node*t=NIL){
-        node *x = rt; while (lx->sz != k){
-            if (k < lx->sz) x = lx;
-            else k -= lx->sz+1, x = rx;
-        }
-        if (t == NIL) rt = x;
-
-        return x->splay(t);
-    }
-
-    node *select(int a, int b){
-        return select(a-1, select(b))->r;
-    }
-
-    S prod(int a, int b) {
-        return select(a, b)->d;
-    }
-
-    void set(int p, S s) {
-        node* x = select(p, p+1); x->d = s;
-        while (x->p != NIL) {
-            x = x->p;
-            x->upd();
-        }
-    }
-};
-
-#undef NIL
-
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-node *node::NIL = new node;
-
-#undef node
-#undef l
-#undef r
-#undef lx
-#undef rx
-#undef px
-#undef ly
-#undef ry
-#undef py
-
-}  // namespace splay
-
-}  // namespace lastweapon
 
 using namespace lastweapon;
 
-struct rec{
-    int ky, ss, ls, rs, ms;
-    rec(int s = 0) {
-        ky = ss = ls = rs = ms = s;
-    }
-};
-
-rec e() {
-    rec z = rec(-INF);
-    z.ss = 0;
-    return z;
-}
-
-void op(rec& x, const rec l, const rec r) {
-    x.ss = l.ss + x.ky + r.ss;
-    x.ls = max(l.ls, l.ss + x.ky + max(0, r.ls));
-    x.rs = max(r.rs, max(0, l.rs) + x.ky + r.ss);
-    x.ms = max({l.ms, max(l.rs, 0) + x.ky + max(0, r.ls), r.ms});
-}
-
-using node = splay::node<rec,op,e>;
-using Splay = splay::splay<rec, op, e>;
+const int N = int(5e5) + 9, Z = 26, L = int(1e6) + 9;
+acm<N, Z> A; char s[L];
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
-    int n; RD(n); vector<rec> a(n); REP(i, n) a[i] = rec(RD());
-    Splay T(a);
 
     Rush {
-        char cmd; RC(cmd); node *x, *y, *z;
-        int a, b;
-
-        if (cmd == 'I') {
-            RD(a, b);
-            y = T.select(a-1, z = T.select(a)); x = new node(); x->reset(rec(b));
-            y->setr(x), y->upd(), z->upd();
-        } else if (cmd == 'D') {
-            RD(a);
-            y = T.select(a-1, z = T.select(a+1));
-            y->c[1] = node::NIL; y->upd(); z->upd();
-        } else if (cmd == 'R') {
-            int x, y; RD(x, y);
-            T.set(x, rec(y));
-        } else {
-            RD(a, b); ++b;
-            cout << T.prod(a, b).ms << endl;
-        }
+        A.init(); Rush A.insert(RS(s)); A.build();
+        RS(s); cout << A.run(s) << endl;
     }
 }

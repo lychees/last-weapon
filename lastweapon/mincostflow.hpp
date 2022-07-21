@@ -1,15 +1,7 @@
 #ifndef LASTWEAPON_MINCOSTFLOW_HPP
 #define LASTWEAPON_MINCOSTFLOW_HPP 1
 
-#include <algorithm>
-#include <cassert>
-#include <limits>
-#include <queue>
-#include <vector>
-#include <bitset>
-
-#include "lastweapon/internal_csr"
-#include "lastweapon/internal_queue"
+#include "lastweapon/io"
 
 namespace lastweapon {
 

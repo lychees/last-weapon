@@ -54,4 +54,4 @@ template <size_t N, size_t Z> struct sam {
 };
 }  // namespace lastweapon
 
-#endif  // LASTWEAPON_STRING_HPP
+#endif  // LASTWEAPON_ACM_HPP

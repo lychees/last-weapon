@@ -60,6 +60,7 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 
 ### Strings
 - [`#include <lastweapon/string>`](./string.html)
+- [`#include <lastweapon/acm>`](./acm.html)
 - [`#include <lastweapon/sam>`](./sam.html)
 
 ### Geometry

@@ -2,6 +2,8 @@
     "files.associations": {
         "vector": "cpp",
         "bitset": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "acm": "cpp",
+        "xiosbase": "cpp"
     }
 }

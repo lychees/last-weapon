@@ -1,5 +1,6 @@
 # sam
-...
+
+- [https://oi-wiki.org/string/sam/](https://oi-wiki.org/string/sam/)
 
 **@{keyword.complexity}**
 
