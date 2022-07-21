@@ -2,7 +2,6 @@
 #define LASTWEAPON_SPLAY_HPP 1
 
 #include "lastweapon/io"
-#include "lastweapon/internal_bit"
 
 namespace lastweapon {
 

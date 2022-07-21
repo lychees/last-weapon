@@ -8,3 +8,4 @@
 ## @{keyword.examples}
 
 @{example.HDU2222}
+@{example.POJ1625}

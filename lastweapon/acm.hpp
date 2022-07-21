@@ -5,10 +5,10 @@
 
 namespace lastweapon {
 
-template <size_t N, size_t Z> struct acm {
+template <size_t N, size_t Z, int (*ctoi)(char c)> struct acm {
     int trans[N][Z], fail[N], cnt[N]; int Q[N], cz, op, tot;
 
-    ACM() {
+    acm() {
         init();
     }
 
@@ -36,7 +36,7 @@ template <size_t N, size_t Z> struct acm {
 
     void insert(char str[]){
         int u = 0; REP_S(cur, str) {
-            char c = *cur - 'a';
+            int c = ctoi(*cur);
             if (!v) v = new_node();
             u = v;
         }
@@ -47,7 +47,7 @@ template <size_t N, size_t Z> struct acm {
     int run(char str[]){
         int z = 0; int t, u = 0; fill(vis, vis + tot, 0);
         REP_S(cur, str){
-            char c = *cur - 'a';
+            int c = ctoi(*cur);
             for (t=u=v;t&&!vis[t];t=fail[t]) {
                 z += cnt[t];
                 vis[t] = 1;

@@ -21,6 +21,7 @@
     SPOJ_GSS6 = "https://www.spoj.com/problems/GSS6/"
     Luogu3375 = "https://www.luogu.com.cn/problem/P3375"
     HDU2222 = "https://vjudge.net/problem/HDU-2222"
+    POJ1625 = "https://vjudge.net/problem/POJ-1625"
 
     # usage
     modint_usage = ""

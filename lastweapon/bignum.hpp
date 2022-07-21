@@ -1,32 +1,9 @@
 #ifndef LASTWEAPON_BIGNUM_HPP
 #define LASTWEAPON_BIGNUM_HPP 1
 
-#include <functional>
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <numeric>
-#include <cstring>
-#include <climits>
-#include <cassert>
-#include <complex>
-#include <cstdio>
-#include <string>
-#include <vector>
-#include <bitset>
-#include <queue>
-#include <stack>
-#include <cmath>
-#include <ctime>
-#include <list>
-#include <set>
-#include <map>
+#include "lastweapon/io"
 
 namespace lastweapon {
-
-using namespace std;
 
 const int __base = 1e8;
 const int P10[] = {1, 10, int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7), int(1e8), int(1e9)};

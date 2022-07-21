@@ -3,7 +3,12 @@
 using namespace lastweapon;
 
 const int N = int(5e5) + 9, Z = 26, L = int(1e6) + 9;
-acm<N, Z> A; char s[L];
+
+int ctoi(char c) {
+    return c - 'a';
+}
+
+acm<N, Z, ctoi> A; char s[L];
 
 int main() {
 #ifndef ONLINE_JUDGE
