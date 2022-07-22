@@ -1,11 +1,8 @@
-
-
 /*
     This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
-    Template Date: 2022.6.21
+    Template Date: 2022.7.22
     Note: ...
 */
-
 #pragma comment(linker, "/STACK:36777216")
 #define LOCAL
 #include <functional>
@@ -40,24 +37,6 @@ using namespace std;
 #define REP_1(i, n) for (int i=1;i<=n;++i)
 #define FOR_1(i, a, b) for (int i=a;i<=b;++i)
 #define DWN_1(i, b, a) for (int i=b;i>=a;--i)
-#define REP_C(i, n) for (int n____=n,i=0;i<n____;++i)
-#define FOR_C(i, a, b) for (int b____=b,i=a;i<b____;++i)
-#define DWN_C(i, b, a) for (int a____=a,i=b-1;i>=a____;--i)
-#define REP_N(i, n) for (i=0;i<n;++i)
-#define FOR_N(i, a, b) for (i=a;i<b;++i)
-#define DWN_N(i, b, a) for (i=b-1;i>=a;--i)
-#define REP_1_C(i, n) for (int n____=n,i=1;i<=n____;++i)
-#define FOR_1_C(i, a, b) for (int b____=b,i=a;i<=b____;++i)
-#define DWN_1_C(i, b, a) for (int a____=a,i=b;i>=a____;--i)
-#define REP_1_N(i, n) for (i=1;i<=n;++i)
-#define FOR_1_N(i, a, b) for (i=a;i<=b;++i)
-#define DWN_1_N(i, b, a) for (i=b;i>=a;--i)
-#define REP_C_N(i, n) for (int n____=(i=0,n);i<n____;++i)
-#define FOR_C_N(i, a, b) for (int b____=(i=0,b);i<b____;++i)
-#define DWN_C_N(i, b, a) for (int a____=(i=b-1,a);i>=a____;--i)
-#define REP_1_C_N(i, n) for (int n____=(i=1,n);i<=n____;++i)
-#define FOR_1_C_N(i, a, b) for (int b____=(i=a,b);i<=b____;++i)
-#define DWN_1_C_N(i, b, a) for (int a____=(i=b,a);i>=a____;--i)
 
 #define ECH(it, A) for (__typeof((A).begin()) it=(A).begin(); it != (A).end(); ++it)
 #define rECH(it, A) for (__typeof((A).rbegin()) it=(A).rbegin(); it != (A).rend(); ++it)
@@ -66,12 +45,6 @@ using namespace std;
 #define REP_G(i, u) REP_L(i,hd[u],suc)
 #define REP_SS(x, s) for (int x=s;x;x=(x-1)&s)
 #define DO(n) for ( int ____n = n; ____n-->0; )
-#define REP_2(i, j, n, m) REP(i, n) REP(j, m)
-#define REP_2_1(i, j, n, m) REP_1(i, n) REP_1(j, m)
-#define REP_3(i, j, k, n, m, l) REP(i, n) REP(j, m) REP(k, l)
-#define REP_3_1(i, j, k, n, m, l) REP_1(i, n) REP_1(j, m) REP_1(k, l)
-#define REP_4(i, j, k, ii, n, m, l, nn) REP(i, n) REP(j, m) REP(k, l) REP(ii, nn)
-#define REP_4_1(i, j, k, ii, n, m, l, nn) REP_1(i, n) REP_1(j, m) REP_1(k, l) REP_1(ii, nn)
 
 #define ALL(A) A.begin(), A.end()
 #define LLA(A) A.rbegin(), A.rend()
@@ -224,19 +197,12 @@ template<class T> inline T min(T a, T b, T c){return min(min(a, b), c);}
 template<class T> inline T max(T a, T b, T c){return max(max(a, b), c);}
 template<class T> inline T min(T a, T b, T c, T d){return min(min(a, b), min(c, d));}
 template<class T> inline T max(T a, T b, T c, T d){return max(max(a, b), max(c, d));}
-template<class T> inline T min(T a, T b, T c, T d, T e){return min(min(min(a,b),min(c,d)),e);}
-template<class T> inline T max(T a, T b, T c, T d, T e){return max(max(max(a,b),max(c,d)),e);}
 template<class T> inline T sqr(T a){return a*a;}
 template<class T> inline T cub(T a){return a*a*a;}
 template<class T> inline T ceil(T x, T y){return (x - 1) / y + 1;}
 template<class T> T abs(T x){return x>0?x:-x;}
 inline int sgn(DB x){return x < -EPS ? -1 : x > EPS;}
 inline int sgn(DB x, DB y){return sgn(x - y);}
-
-inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
-inline DB cot(DB x){return 1./tan(x);};
-inline DB sec(DB x){return 1./cos(x);};
-inline DB csc(DB x){return 1./sin(x);};
 
 
 
@@ -278,101 +244,328 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 
-
 namespace lastweapon {
+namespace internal {
 
-template <size_t N, size_t Z> struct sam {
-    int trans[N][Z], par[N], len[N], pos[N], tot, tail;
+std::vector<int> sa_naive(const std::vector<int>& s) {
+    int n = int(s.size());
+    std::vector<int> sa(n);
+    std::iota(sa.begin(), sa.end(), 0);
+    std::sort(sa.begin(), sa.end(), [&](int l, int r) {
+        if (l == r) return false;
+        while (l < n && r < n) {
+            if (s[l] != s[r]) return s[l] < s[r];
+            l++;
+            r++;
+        }
+        return l == n;
+    });
+    return sa;
+}
 
-#define v trans[u][c]
-#define p par[u]
-#define pp par[uu]
+std::vector<int> sa_doubling(const std::vector<int>& s) {
+    int n = int(s.size());
+    std::vector<int> sa(n), rnk = s, tmp(n);
+    std::iota(sa.begin(), sa.end(), 0);
+    for (int k = 1; k < n; k *= 2) {
+        auto cmp = [&](int x, int y) {
+            if (rnk[x] != rnk[y]) return rnk[x] < rnk[y];
+            int rx = x + k < n ? rnk[x + k] : -1;
+            int ry = y + k < n ? rnk[y + k] : -1;
+            return rx < ry;
+        };
+        std::sort(sa.begin(), sa.end(), cmp);
+        tmp[sa[0]] = 0;
+        for (int i = 1; i < n; i++) {
+            tmp[sa[i]] = tmp[sa[i - 1]] + (cmp(sa[i - 1], sa[i]) ? 1 : 0);
+        }
+        std::swap(tmp, rnk);
+    }
+    return sa;
+}
 
-    sam() {
-        init();
+template <int THRESHOLD_NAIVE = 10, int THRESHOLD_DOUBLING = 40>
+std::vector<int> sa_is(const std::vector<int>& s, int upper) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    if (n == 1) return {0};
+    if (n == 2) {
+        if (s[0] < s[1]) {
+            return {0, 1};
+        } else {
+            return {1, 0};
+        }
+    }
+    if (n < THRESHOLD_NAIVE) {
+        return sa_naive(s);
+    }
+    if (n < THRESHOLD_DOUBLING) {
+        return sa_doubling(s);
     }
 
-    void init() {
-        tot = 0; tail = new_node();
+    std::vector<int> sa(n);
+    std::vector<bool> ls(n);
+    for (int i = n - 2; i >= 0; i--) {
+        ls[i] = (s[i] == s[i + 1]) ? ls[i + 1] : (s[i] < s[i + 1]);
+    }
+    std::vector<int> sum_l(upper + 1), sum_s(upper + 1);
+    for (int i = 0; i < n; i++) {
+        if (!ls[i]) {
+            sum_s[s[i]]++;
+        } else {
+            sum_l[s[i] + 1]++;
+        }
+    }
+    for (int i = 0; i <= upper; i++) {
+        sum_s[i] += sum_l[i];
+        if (i < upper) sum_l[i + 1] += sum_s[i];
     }
 
-    inline int new_node(){
-        RST(trans[tot]);
-        return tot++;
-    }
-
-    inline int new_node(int u){
-        CPY(trans[tot], trans[u]); par[tot] = par[u]; pos[tot] = pos[u];
-        return tot++;
-    }
-
-    inline int h(int u){
-        return len[u] - len[p];
-    }
-
-    int Ext(int c){
-        int u = tail, uu = new_node(); len[uu] = len[u] + 1;
-        while (u && !v) v = uu, u = p;
-        if (!u && !v) v = uu, pp = 0;
-        else{
-            if (len[v] == len[u] + 1) pp = v;
-            else{
-                int _v = v, vv = new_node(_v); len[vv] = len[u] + 1; par[_v] = pp = vv;
-                while (u && v == _v) v = vv, u = p;
-                if (!u && v == _v) v = vv;
+    auto induce = [&](const std::vector<int>& lms) {
+        std::fill(sa.begin(), sa.end(), -1);
+        std::vector<int> buf(upper + 1);
+        std::copy(sum_s.begin(), sum_s.end(), buf.begin());
+        for (auto d : lms) {
+            if (d == n) continue;
+            sa[buf[s[d]]++] = d;
+        }
+        std::copy(sum_l.begin(), sum_l.end(), buf.begin());
+        sa[buf[s[n - 1]]++] = n - 1;
+        for (int i = 0; i < n; i++) {
+            int v = sa[i];
+            if (v >= 1 && !ls[v - 1]) {
+                sa[buf[s[v - 1]]++] = v - 1;
             }
         }
-        return tail = uu;
+        std::copy(sum_l.begin(), sum_l.end(), buf.begin());
+        for (int i = n - 1; i >= 0; i--) {
+            int v = sa[i];
+            if (v >= 1 && ls[v - 1]) {
+                sa[--buf[s[v - 1] + 1]] = v - 1;
+            }
+        }
+    };
+
+    std::vector<int> lms_map(n + 1, -1);
+    int m = 0;
+    for (int i = 1; i < n; i++) {
+        if (!ls[i - 1] && ls[i]) {
+            lms_map[i] = m++;
+        }
+    }
+    std::vector<int> lms;
+    lms.reserve(m);
+    for (int i = 1; i < n; i++) {
+        if (!ls[i - 1] && ls[i]) {
+            lms.push_back(i);
+        }
     }
 
-#undef c
-#undef p
-#undef pp
-#undef v
+    induce(lms);
 
-};
+    if (m) {
+        std::vector<int> sorted_lms;
+        sorted_lms.reserve(m);
+        for (int v : sa) {
+            if (lms_map[v] != -1) sorted_lms.push_back(v);
+        }
+        std::vector<int> rec_s(m);
+        int rec_upper = 0;
+        rec_s[lms_map[sorted_lms[0]]] = 0;
+        for (int i = 1; i < m; i++) {
+            int l = sorted_lms[i - 1], r = sorted_lms[i];
+            int end_l = (lms_map[l] + 1 < m) ? lms[lms_map[l] + 1] : n;
+            int end_r = (lms_map[r] + 1 < m) ? lms[lms_map[r] + 1] : n;
+            bool same = true;
+            if (end_l - l != end_r - r) {
+                same = false;
+            } else {
+                while (l < end_l) {
+                    if (s[l] != s[r]) {
+                        break;
+                    }
+                    l++;
+                    r++;
+                }
+                if (l == n || s[l] != s[r]) same = false;
+            }
+            if (!same) rec_upper++;
+            rec_s[lms_map[sorted_lms[i]]] = rec_upper;
+        }
+
+        auto rec_sa =
+            sa_is<THRESHOLD_NAIVE, THRESHOLD_DOUBLING>(rec_s, rec_upper);
+
+        for (int i = 0; i < m; i++) {
+            sorted_lms[i] = lms[rec_sa[i]];
+        }
+        induce(sorted_lms);
+    }
+    return sa;
+}
+
+}  // namespace internal
+
+std::vector<int> suffix_array(const std::vector<int>& s, int upper) {
+    assert(0 <= upper);
+    for (int d : s) {
+        assert(0 <= d && d <= upper);
+    }
+    auto sa = internal::sa_is(s, upper);
+    return sa;
+}
+
+template <class T> std::vector<int> suffix_array(const std::vector<T>& s) {
+    int n = int(s.size());
+    std::vector<int> idx(n);
+    iota(idx.begin(), idx.end(), 0);
+    sort(idx.begin(), idx.end(), [&](int l, int r) { return s[l] < s[r]; });
+    std::vector<int> s2(n);
+    int now = 0;
+    for (int i = 0; i < n; i++) {
+        if (i && s[idx[i - 1]] != s[idx[i]]) now++;
+        s2[idx[i]] = now;
+    }
+    return internal::sa_is(s2, now);
+}
+
+std::vector<int> suffix_array(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return internal::sa_is(s2, 255);
+}
+
+template <class T>
+std::vector<int> lcp_array(const std::vector<T>& s,
+                           const std::vector<int>& sa) {
+    int n = int(s.size());
+    assert(n >= 1);
+    std::vector<int> rnk(n);
+    for (int i = 0; i < n; i++) {
+        rnk[sa[i]] = i;
+    }
+    std::vector<int> lcp(n - 1);
+    int h = 0;
+    for (int i = 0; i < n; i++) {
+        if (h > 0) h--;
+        if (rnk[i] == 0) continue;
+        int j = sa[rnk[i] - 1];
+        for (; j + h < n && i + h < n; h++) {
+            if (s[j + h] != s[i + h]) break;
+        }
+        lcp[rnk[i] - 1] = h;
+    }
+    return lcp;
+}
+
+std::vector<int> lcp_array(const std::string& s, const std::vector<int>& sa) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return lcp_array(s2, sa);
+}
+
+template <class T> std::vector<int> z_algorithm(const std::vector<T>& s) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    std::vector<int> z(n);
+    z[0] = 0;
+    for (int i = 1, j = 0; i < n; i++) {
+        int& k = z[i];
+        k = (j + z[j] <= i) ? 0 : std::min(j + z[j] - i, z[i - j]);
+        while (i + k < n && s[k] == s[i + k]) k++;
+        if (j + z[j] < i + z[i]) j = i;
+    }
+    z[0] = n;
+    return z;
+}
+
+std::vector<int> z_algorithm(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return z_algorithm(s2);
+}
+
+template <class T> std::vector<int> kmp(const std::vector<T>& s) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    std::vector<int> pi(n);
+    pi[0] = -1;
+    for (int i = 1, j = -1; i < n; i++) {
+        while (j >= 0 && s[i] != s[j+1]) j = pi[j];
+        if (s[i] == s[j+1]) ++j;
+        pi[i] = j;
+    }
+    return pi;
+}
+
+std::vector<int> kmp(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return kmp(s2);
+}
+
+template <class T> std::vector<int> manacher(const std::vector<T>& ss) {
+    int nn = int(ss.size());
+    if (nn == 0) return {};
+    int n = 2*nn+2;
+    std::vector<T> s(n+1);
+    s[0] = '$';
+    for(int i = 0; i < nn; i++) {
+        s[i*2+1] = '.';
+        s[i*2+2] = ss[i];
+    }
+    s[n-1] = '.';
+    s[n] = 0;
+    std::vector<int> r(n);
+    r[0] = 0;
+    int mx = 0, mi = 0;
+    for (int i = 1; i < n; i++) {
+        for (r[i]=mx>i?std::min(r[2*mi-i],mx-i):1;s[i+r[i]]==s[i-r[i]];++r[i]);
+        if (i+r[i]>mx)mx=i+r[i],mi=i;
+    }
+    return r;
+}
+
+std::vector<int> manacher(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> ss(n);
+    for (int i = 0; i < n; i++) {
+        ss[i] = s[i];
+    }
+    return manacher(ss);
+}
+
 }  // namespace lastweapon
 
-using namespace lastweapon;
-
-const int N = int(2e5) + 9, Z = 26;
-char str[N];
-
-#define sam sam<N,Z>
-#define c (*cur - 'a')
-#define v trans[u][c]
-#define p par[u]
-#define lenn C
-
-struct my_sam : public sam {
-    void init(){
-        RS(str); REP_S(cur, str) Ext(c);
-    }
-    void run() {
-        static int C[N], Q[N]; //RST(C);
-        REP(i, tot) ++C[len[i]];
-        REP_1(i, len[tail]) C[i] += C[i-1];
-        REP(i, tot) Q[--C[len[i]]] = i;
-
-        while (~scanf("%s", str)){
-            fill(lenn, lenn+tot, 0); int u = 0, l = 0; REP_S(cur, str){
-                while (u && !v) l = len[u = p];
-                if (u = v) checkMax(lenn[u], ++l);
-            }
-            DWN(u, tot, 1){
-                //int u = Q[i];
-                checkMax(lenn[p], lenn[u]);
-                checkMin(len[u], lenn[u]);
-            }
-        }
-        cout << *max_element(len+1, len+1+tot) << endl;
-    }
-} S;
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
 
-    S.init(); S.run();
+    int n, m; RD(n, m);
+    if (m == 1) {
+        cout << n << endl;
+        return 0;
+    }
+    VI T(n+m); REP(i, n) RD(T[m+i]); REP(i, m) RD(T[i]);
+    REP(i, m-1) T[i] = T[i+1] - T[i]; T[m-1] = INF;
+    REP(i, n-1) T[m+i] = T[m+i+1] - T[m+i]; T.pop_back();
+
+    auto pi = lastweapon::kmp(T);
+
+    int z = 0; FOR(i, m, SZ(pi)) if (pi[i] == m-2) ++z;
+    cout << z << endl;
 }

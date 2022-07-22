@@ -1,12 +1,10 @@
 #ifndef LASTWEAPON_IO_HPP
 #define LASTWEAPON_IO_HPP 1
-
 /*
     This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
-    Template Date: 2022.6.21
+    Template Date: 2022.7.22
     Note: ...
 */
-
 #pragma comment(linker, "/STACK:36777216")
 //#pragma GCC optimize ("O2")
 #define LOCAL

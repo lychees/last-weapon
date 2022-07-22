@@ -1,10 +1,7 @@
 #ifndef LASTWEAPON_STRING_HPP
 #define LASTWEAPON_STRING_HPP 1
-
 #include "lastweapon/io"
-
 namespace lastweapon {
-
 namespace internal {
 
 std::vector<int> sa_naive(const std::vector<int>& s) {
