@@ -1,42 +1,18 @@
-#include <lastweapon/bignum>
-#include <lastweapon/acm>
-using namespace lastweapon;
-
-const int N = 51, Z = 50, AN = 101;
-map<char, int> o; char s[N];
-bignum dp[N][AN];
-
-int ctoi(char c) {
-    return o[c];
-}
-
-#define acm acm<AN,Z,ctoi>
-#define v trans[u][c]
-#define p fail[u]
-struct my_acm : public acm {
-    void build(){
-        acm::build();
-        FOR(u, 1, tot) cnt[u] += cnt[p];
-    }
-    bignum run(int n, int z) {
-
-        dp[0][0] = 1; REP(i, n) {
-            REP(u, tot) REP(c, z) if (!cnt[v]) {
-                dp[i+1][v] += dp[i][u];
-            }
-        }
-        return accumulate(dp[n], dp[n]+tot, bignum(0));
-    }
-};
-
-my_acm A;
+#include <lastweapon/string>
 
 int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
-
-    int z, n, m; RD(z, n, m); REP(i, z) o[RC()] = i;
-    A.init(); DO(m) A.insert(RS(s)); A.build();
-    cout << A.run(n, z) << endl;
+    int n, m; RD(n, m);
+    if (m == 1) {
+        cout << n << endl;
+        return 0;
+    }
+    VI T(n+m); REP(i, n) RD(T[m+i]); REP(i, m) RD(T[i]);
+    REP(i, m-1) T[i] = T[i+1] - T[i]; T[m-1] = INF;
+    REP(i, n-1) T[m+i] = T[m+i+1] - T[m+i]; T.pop_back();
+    auto pi = lastweapon::kmp(T);
+    int z = 0; FOR(i, m, SZ(pi)) if (pi[i] == m-2) ++z;
+    cout << z << endl;
 }

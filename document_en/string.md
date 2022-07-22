@@ -87,6 +87,8 @@ TODO ...
 
 @{example.Luogu3375}
 
+@{example.CF471D}
+
 ## Manacher
 
 ### @{keyword.examples}

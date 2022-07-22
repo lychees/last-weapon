@@ -13,17 +13,23 @@
     segtree_practice = "https://atcoder.jp/contests/practice2/tasks/practice2_j"
     lazyseg_practice1 = "https://atcoder.jp/contests/practice2/tasks/practice2_k"
     lazyseg_practice2 = "https://atcoder.jp/contests/practice2/tasks/practice2_l"
+
     domes = "https://icpc.kattis.com/problems/domes"
+
     Luogu3829 = "https://www.luogu.com.cn/problem/P3829"
     Luogu3804 = "https://www.luogu.com.cn/problem/P3804"
     Luogu3805 = "https://www.luogu.com.cn/problem/P3805"
     Luogu2408 = "https://www.luogu.com.cn/problem/P2408"
     Luogu3375 = "https://www.luogu.com.cn/problem/P3375"
+    
     HDU2222 = "https://vjudge.net/problem/HDU-2222"
+    
     POJ1625 = "https://vjudge.net/problem/POJ-1625"
 
     SPOJ_GSS6 = "https://www.spoj.com/problems/GSS6/"
     SPOJ_LCS2 = "https://www.spoj.com/problems/LCS2/"
+
+    CF471D = "https://codeforces.com/contest/471/problem/D"
 
     # usage
     modint_usage = ""
