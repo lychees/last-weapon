@@ -305,32 +305,113 @@ template <size_t N, size_t Z, int (*ctoi)(char c)> struct acm {
 };
 }  // namespace lastweapon
 
+
+
+namespace lastweapon {
+
+inline bool _1(int x, int i){return bool(x&1<<i);}
+inline bool _1(LL x, int i){return bool(x&1LL<<i);}
+inline LL _1(int i){return 1LL<<i;}
+inline LL _U(int i){return _1(i) - 1;};
+
+inline int reverse_bits(int x){
+    x = ((x >> 1) & 0x55555555) | ((x << 1) & 0xaaaaaaaa);
+    x = ((x >> 2) & 0x33333333) | ((x << 2) & 0xcccccccc);
+    x = ((x >> 4) & 0x0f0f0f0f) | ((x << 4) & 0xf0f0f0f0);
+    x = ((x >> 8) & 0x00ff00ff) | ((x << 8) & 0xff00ff00);
+    x = ((x >>16) & 0x0000ffff) | ((x <<16) & 0xffff0000);
+    return x;
+}
+
+inline LL reverse_bits(LL x){
+    x = ((x >> 1) & 0x5555555555555555LL) | ((x << 1) & 0xaaaaaaaaaaaaaaaaLL);
+    x = ((x >> 2) & 0x3333333333333333LL) | ((x << 2) & 0xccccccccccccccccLL);
+    x = ((x >> 4) & 0x0f0f0f0f0f0f0f0fLL) | ((x << 4) & 0xf0f0f0f0f0f0f0f0LL);
+    x = ((x >> 8) & 0x00ff00ff00ff00ffLL) | ((x << 8) & 0xff00ff00ff00ff00LL);
+    x = ((x >>16) & 0x0000ffff0000ffffLL) | ((x <<16) & 0xffff0000ffff0000LL);
+    x = ((x >>32) & 0x00000000ffffffffLL) | ((x <<32) & 0xffffffff00000000LL);
+    return x;
+}
+
+template<class T> inline bool odd(T x){return x&1;}
+template<class T> inline bool even(T x){return !odd(x);}
+template<class T> inline T low_bit(T x) {return x & -x;}
+template<class T> inline T high_bit(T x) {T p = low_bit(x);while (p != x) x -= p, p = low_bit(x);return p;}
+template<class T> inline T cover_bit(T x){T p = 1; while (p < x) p <<= 1;return p;}
+template<class T> inline int cover_idx(T x){int p = 0; while (_1(p) < x ) ++p; return p;}
+
+inline int clz(int x){return __builtin_clz(x);}
+inline int clz(LL x){return __builtin_clzll(x);}
+inline int ctz(int x){return __builtin_ctz(x);}
+inline int ctz(LL x){return __builtin_ctzll(x);}
+inline int lg2(int x){return !x ? -1 : 31 - clz(x);}
+inline int lg2(LL x){return !x ? -1 : 63 - clz(x);}
+inline int low_idx(int x){return !x ? -1 : ctz(x);}
+inline int low_idx(LL x){return !x ? -1 : ctz(x);}
+inline int high_idx(int x){return lg2(x);}
+inline int high_idx(LL x){return lg2(x);}
+inline int parity(int x){return __builtin_parity(x);}
+inline int parity(LL x){return __builtin_parityll(x);}
+inline int count_bits(int x){return __builtin_popcount(x);}
+inline int count_bits(LL x){return __builtin_popcountll(x);}
+
+}
+
+
+
 using namespace lastweapon;
-const int N = int(1e5) + 9, Z = 26;
-char T[N], P[N]; VVI dp;
+
+const char SIGMA[] = {'A', 'T', 'C', 'G'};
+int ord[128];
+
+const int N = int(1e3) + 9, M = 10, Z = 4, L = 109;
+char s[N]; int dp[2][N][1<<M], val[1<<M];
 int n, m;
 
-int ctoi(char c){return c -'a';}
+int ctoi(char c){return ord[c];}
 #define acm acm<N,Z,ctoi>
-struct my_acm : public acm{
-    int run() {
-        n = strlen(RS(T)), m = strlen(RS(P)); dp.resize(n+1); insert(P); build();
-        dp[0].resize(tot, -INF); dp[0][0] = 0;
 #define v trans[u][c]
-        REP(i, n) {
-            dp[i+1].resize(tot, -INF);
-            REP(u, tot) {
-                if (T[i] == '?') {
-                    REP(c, Z) {
-                        checkMax(dp[i+1][v], dp[i][u] + cnt[v]);
-                    }
-                } else {
-                    int c = T[i] - 'a';
-                    checkMax(dp[i+1][v], dp[i][u] + cnt[v]);
-                }
+
+struct my_acm : public acm{
+
+    int insert(char str[]){
+        int u = 0; REP_S(cur, str) {
+            int c = ctoi(*cur);
+            if (!v) v = new_node();
+            u = v;
+        }
+        return u;
+    }
+
+    void init() {
+        RST(val); acm::init(); REP(i ,m) {
+            int u = insert(RS(s));
+            cnt[u] |= _1(i);
+            RD(val[_1(i)]);
+        }
+        build(); FOR(i, 1, op) {
+            int u = Q[i];
+            cnt[u] |= cnt[fail[u]];
+        }
+        FOR(s, 1, _1(m)) val[s] = val[s^low_bit(s)] + val[low_bit(s)];
+    }
+
+    void run(){
+        int p = 0, q; RST(dp[p]), dp[p][0][0] = 1; REP(i, n){
+            q = p, p ^= 1, RST(dp[p]); REP(u, tot) REP(s, _1(m)) if (dp[q][u][s]) {
+                REP(c, Z) dp[p][v][s|cnt[v]] = true;
             }
         }
-        return *max_element(ALL(dp[n]));
+
+        int res = -1; REP(s, _1(m)){
+            if (val[s] <= res) continue;
+            REP(u, tot) if (dp[p][u][s]){
+                res = val[s];
+                break;
+            }
+        }
+        if (res < 0) puts("No Rabbit after 2012!");
+        else OT(res);
     }
 } A;
 
@@ -338,5 +419,8 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
-    cout << A.run() << endl;
+    REP(i, Z) ord[SIGMA[i]] = i;
+    while (~scanf("%d %d", &m, &n)) {
+        A.init(), A.run();
+    }
 }

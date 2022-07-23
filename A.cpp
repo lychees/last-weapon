@@ -1,30 +1,57 @@
 #include <lastweapon/acm>
+#include <lastweapon/bitwise>
 using namespace lastweapon;
-const int N = int(1e5) + 9, Z = 26;
-char T[N], P[N]; VVI dp;
+const char SIGMA[] = {'A', 'T', 'C', 'G'};
+int ord[128];
+
+const int N = int(1e3) + 9, M = 10, Z = 4, L = 109;
+char s[N]; int dp[2][N][1<<M], val[1<<M];
 int n, m;
 
-int ctoi(char c){return c -'a';}
+int ctoi(char c){return ord[c];}
 #define acm acm<N,Z,ctoi>
-struct my_acm : public acm{
-    int run() {
-        n = strlen(RS(T)), m = strlen(RS(P)); dp.resize(n+1); insert(P); build();
-        dp[0].resize(tot, -INF); dp[0][0] = 0;
 #define v trans[u][c]
-        REP(i, n) {
-            dp[i+1].resize(tot, -INF);
-            REP(u, tot) {
-                if (T[i] == '?') {
-                    REP(c, Z) {
-                        checkMax(dp[i+1][v], dp[i][u] + cnt[v]);
-                    }
-                } else {
-                    int c = T[i] - 'a';
-                    checkMax(dp[i+1][v], dp[i][u] + cnt[v]);
-                }
+
+struct my_acm : public acm{
+
+    int insert(char str[]){
+        int u = 0; REP_S(cur, str) {
+            int c = ctoi(*cur);
+            if (!v) v = new_node();
+            u = v;
+        }
+        return u;
+    }
+
+    void init() {
+        RST(val); acm::init(); REP(i ,m) {
+            int u = insert(RS(s));
+            cnt[u] |= _1(i);
+            RD(val[_1(i)]);
+        }
+        build(); FOR(i, 1, op) {
+            int u = Q[i];
+            cnt[u] |= cnt[fail[u]];
+        }
+        FOR(s, 1, _1(m)) val[s] = val[s^low_bit(s)] + val[low_bit(s)];
+    }
+
+    void run(){
+        int p = 0, q; RST(dp[p]), dp[p][0][0] = 1; REP(i, n){
+            q = p, p ^= 1, RST(dp[p]); REP(u, tot) REP(s, _1(m)) if (dp[q][u][s]) {
+                REP(c, Z) dp[p][v][s|cnt[v]] = true;
             }
         }
-        return *max_element(ALL(dp[n]));
+
+        int res = -1; REP(s, _1(m)){
+            if (val[s] <= res) continue;
+            REP(u, tot) if (dp[p][u][s]){
+                res = val[s];
+                break;
+            }
+        }
+        if (res < 0) puts("No Rabbit after 2012!");
+        else OT(res);
     }
 } A;
 
@@ -32,5 +59,9 @@ int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
-    cout << A.run() << endl;
+    REP(i, Z) ord[SIGMA[i]] = i;
+    while (~scanf("%d %d", &m, &n)) {
+        A.init(), A.run();
+    }
 }
+

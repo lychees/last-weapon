@@ -3,7 +3,7 @@
 
 #include "lastweapon/io"
 
-namespace Bitwise {
+namespace lastweapon {
 
 inline bool _1(int x, int i){return bool(x&1<<i);}
 inline bool _1(LL x, int i){return bool(x&1LL<<i);}
@@ -51,6 +51,6 @@ inline int parity(LL x){return __builtin_parityll(x);}
 inline int count_bits(int x){return __builtin_popcount(x);}
 inline int count_bits(LL x){return __builtin_popcountll(x);}
 
-} using namespace Bitwise;
+}
 
-#endif  // LASTWEAPON_IO_HPP
+#endif  // LASTWEAPON_BITWISE_HPP
