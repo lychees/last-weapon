@@ -108,7 +108,6 @@ typedef vector<VII> VVII;
 
 template<class T> inline T& RD(T &);
 template<class T> inline void OT(const T &);
-//inline int RD(){int x; return RD(x);}
 inline LL RD(){LL x; return RD(x);}
 inline DB& RF(DB &);
 inline DB RF(){DB x; return RF(x);}
@@ -117,8 +116,6 @@ inline char& RC(char &c);
 inline char RC();
 inline char& RC(char &c){scanf(" %c", &c); return c;}
 inline char RC(){char c; return RC(c);}
-//inline char& RC(char &c){c = getchar(); return c;}
-//inline char RC(){return getchar();}
 
 template<class T0, class T1> inline T0& RD(T0 &x0, T1 &x1){RD(x0), RD(x1); return x0;}
 template<class T0, class T1, class T2> inline T0& RD(T0 &x0, T1 &x1, T2 &x2){RD(x0), RD(x1), RD(x2); return x0;}
@@ -266,5 +263,5 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
     //last_ans = x;
 }
-
+namespace lastweapon {}
 #endif  // LASTWEAPON_IO_HPP

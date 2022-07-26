@@ -13,6 +13,7 @@
 
 #include "lastweapon/io"
 #include "lastweapon/bitwise"
+#include "lastweapon/number"
 #include "lastweapon/bignum"
 #include "lastweapon/acm"
 #include "lastweapon/sam"
