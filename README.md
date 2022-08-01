@@ -12,4 +12,6 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 
 ### Textbook
 - [https://oi-wiki.org](https://oi-wiki.org)
+- [https://cp-algorithms.com/index.html](https://cp-algorithms.com/index.html)
+- [https://usaco.guide/adv/](https://usaco.guide/adv/)
 - [https://web.ntnu.edu.tw/~algo](https://web.ntnu.edu.tw/~algo)

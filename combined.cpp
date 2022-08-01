@@ -1,3 +1,4 @@
+
 /*
     This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
     Template Date: 2022.7.22
@@ -181,7 +182,7 @@ const int MOD = int(1e9) + 7;
 const int INF = 0x3f3f3f3f;
 const LL INFF = 0x3f3f3f3f3f3f3f3fLL;
 const DB EPS = 1e-9;
-const DB OO = 1e99;
+const DB OO = 1e20;
 const DB PI = acos(-1.0); //M_PI;
 
 const int dx[] = {-1, 1, 0, 0};
@@ -243,88 +244,398 @@ inline char* RS(char *s){
 LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
+namespace lastweapon {}
 
-const int N = int(2e5) + 9;
-VII adj[N]; vector<pair<LL, PII>> dis; bool vis[N], ok[N]; int cnt[N], sz[N]; LL z, zz;
-int bj[N], tt;
-int n, nn, c, cc, rt, k;
+namespace lastweapon {
 
-void dfsc(int u, int p = 0){
-    int ss = 0; sz[u] = 1; for (auto [v, w]: adj[u]) if (v != p && !vis[v]) {
-        dfsc(v, u), sz[u] += sz[v];
-        checkMax(ss, sz[v]);
+namespace splay {
+
+template <class S, void (*op)(S&, const S, const S), S (*e)()>
+struct node {
+
+    static node *NIL; node *c[2], *p;
+    int sz; S d;
+
+#define NIL node::NIL
+#define l c[0]
+#define r c[1]
+#define lx x->l
+#define rx x->r
+#define px x->p
+#define ly y->l
+#define ry y->r
+#define py y->p
+
+    node(S s = e()){d=e();}
+    inline void reset(S s){l=r=p=NIL,d=s;sz=1;}
+
+    inline void upd(){
+        assert(this != NIL);
+        sz = l->sz + 1 + r->sz;
+        op(d, l->d, r->d);
     }
-    checkMax(ss, nn - sz[u]);
-    if (ss < cc) cc = ss, c = u;
-}
+    inline int sgn(){return p->r==this;}
+    inline void setc(int d,node*x){c[d]=x,px=this;}
+    inline void setl(node*x){setc(0,x);}
+    inline void setr(node*x){setc(1,x);}
 
-void dfs(int u, int p, int uu, LL d) {
-    dis.PB({d, {uu, u}});
-    for (auto [v, w]: adj[u]) if (v != p) {
-        dfs(v, u, uu, d+w);
+    inline void rot(int d){
+        node*y=p,*z=py;z->setc(y->sgn(),this);
+        y->setc(d,c[!d]),setc(!d,y),y->upd();
     }
-}
+    inline void rot(){rot(sgn());}
 
-void gao(int u = 1) {
-    cc = INF, dfsc(u), vis[u = c] = 1;
-    dis.clear(); dis.PB({0, {u, u}}); cnt[u] = 0;
-    for (auto [v, w]: adj[u]) {
-        cnt[v] = 0;
-        dfs(v, u, v, w);
+
+    /*inline node* splay(node*t){
+        while (p!=t) rot(); upd();
+        return this;
+    }*/
+
+    inline node*splay(node*t){
+        int a,b;while(p!=t){
+            if (p->p==t){rot();break;}
+            else a=sgn(),b=p->sgn(),(a^b?this:p)->rot(a),rot(b);
+        }
+        upd();
+        return this;
     }
-    cc = zz = 0; ++tt; SRT(dis); RVS(dis); for(auto a: dis) {
-        LL d = a.fi; int uu = a.se.fi, v = a.se.se;
-        if (cnt[uu] < k/2) {
-            ++cc; ++cnt[uu]; zz += d; bj[v] = tt;
-            if (cc == k) {
-                if (checkMax(z, zz)) {
-                    rt = u;
-                    REP_1(i, n) ok[i] = (bj[i] == tt);
-                }
-                break;
-            }
+};
+
+
+template <class S, void (*op)(S&, const S, const S), S (*e)()>
+struct splay {
+
+#define node node<S, op, e>
+
+    std::vector<node> d;
+    int n; node* rt;
+
+    splay() : splay(0) {}
+    explicit splay(int n) : splay(std::vector<S>(n, e())) {}
+    explicit splay(const std::vector<S>& a) : n(int(a.size())) {
+        rt = new node(); rt->reset(0);
+        REP(i, n) {
+            node* t = new node();
+            t->reset(a[i]);
+            t->setl(rt); t->upd();
+            rt = t;
+        }
+        node* t = new node();
+        t->reset(0);
+        t->setl(rt); t->upd();
+        rt = t;
+    }
+
+    node *select(int k, node*t=NIL){
+        node *x = rt; while (lx->sz != k){
+            if (k < lx->sz) x = lx;
+            else k -= lx->sz+1, x = rx;
+        }
+        if (t == NIL) rt = x;
+
+        return x->splay(t);
+    }
+
+    node *select(int a, int b){
+        return select(a-1, select(b))->r;
+    }
+
+    S prod(int a, int b) {
+        return select(a, b)->d;
+    }
+
+    void set(int p, S s) {
+        node* x = select(p, p+1); x->d = s;
+        while (x->p != NIL) {
+            x = x->p;
+            x->upd();
         }
     }
-    cnt[u] = 0; for (auto [v, w]: adj[u]) cnt[v] = 0;
-    REP(i, k) ++cnt[dis[i].se.fi];
+};
 
-    for (auto [v, w]: adj[u]) if (!vis[v] && cnt[v] > k/2) {
-        nn = sz[v], gao(v);
-        return;
+#undef NIL
+
+template <class S, void (*op)(S&, const S, const S), S (*e)()>
+node *node::NIL = new node;
+
+#undef node
+#undef l
+#undef r
+#undef lx
+#undef rx
+#undef px
+#undef ly
+#undef ry
+#undef py
+
+}  // namespace splay
+
+}  // namespace lastweapon
+
+using namespace lastweapon;
+
+/*
+const int N = int(1e5) + 9, M = N*2;
+
+struct node{
+
+    static node* NIL; node *c[2], *p;
+    int w1, w2, d0; bool r0;
+
+#define NIL node::NIL
+#define l c[0]
+#define r c[1]
+#define lx x->l
+#define rx x->r
+#define px x->p
+#define ly y->l
+#define ry y->r
+#define py y->p
+
+    void reset(){
+        l = r = p = NIL;
+        w1 = w2 = d0 = r0 = 0;
     }
-}
 
-pair<LL, int> patch(int u, int p = 0) {
-    int c = ok[u]; LL z = 0;
-    for (auto [v, w]: adj[u]) if (v != p) {
-        auto t = patch(v, u);
-        c += t.se;
-        if (!ok[v]) {
-            if (t.se < k/2) {
-                checkMax(z, t.fi += w);
-            }
+    inline node(){
+        reset();
+    }
+
+    inline void rev(){
+        r0 ^= 1, swap(l, r);
+    }
+
+    inline void inc(int d){
+        if (this == NIL) return;
+        w1 += d, w2 += d, d0 += d;
+    }
+
+    inline void upd(){
+        w2 = max(l->w2, w1, r->w2);
+    }
+
+    inline void rls(){
+        //if (this == NIL) return;
+        if (r0){
+            l->rev(), r->rev();
+            r0 = 0;
+        }
+        if (d0){
+            l->inc(d0), r->inc(d0);
+            d0 = 0;
         }
     }
-    return {z, c};
+
+    // Ðý×ª
+
+    inline int sgn(){return p->l==this?0:p->r==this?1:-1;}
+    inline void setc(int d,node*x){c[d]=x,px=this;}
+
+    inline void rot(int d){
+        node *y = p, *z = py; if (~y->sgn()) z->setc(y->sgn(), this); else p = z;
+        y->setc(!d, c[d]), setc(d, y), y->upd();
+    }
+
+    inline void rot(){rot(!sgn());}
+    inline void zag(){rot(0);}
+    inline void zig(){rot(1);}
+
+    // ÉìÕ¹
+
+    inline void fix(){if(~sgn()) p->fix(); rls();}
+
+
+    inline node* splay(){
+        fix(); while (~sgn()) rot(); upd();
+        return this;
+    }
+
+    inline node* splay(){
+        fix(); while (sgn() != -1){
+            node *y = p, *z = py; if (y->sgn() == -1){ rot(); break;}
+            if (z->l == y){
+                if (y->l == this) y->zig(), zig();
+                else zag(), zig();
+            }else{
+                if (y->r == this) y->zag(), zag();
+                else zig(), zag();
+            }
+        }
+        upd();
+        return this;
+    }
+
+    inline node* acs(){
+        node *x = this, *y = NIL; do{
+            x->splay();
+            rx = y, x->upd();
+            y = x, x = px;
+        } while (x != NIL);
+        return splay();
+    }
+
+    node* rt(){node* x; for (x = acs(); x->rls(), lx != NIL; x = lx); return x->splay();}
+    node* ert(){acs()->rev(); return this;}
+
+
+    void Link(node *x){
+        if (rt() == x->rt()){
+            puts("-1");
+        }
+        else {
+            ert(), p = x;
+        }
+    }
+
+    void Cut(){
+        acs(); l->p = NIL; l = NIL;
+    }
+
+    void Cut(node* x){
+        if (this == x || rt() != x->rt()){
+            puts("-1");
+        }
+        else {
+            ert(), x->Cut();
+        }
+    }
+
+    void Query(node* x){
+        // x->ert(); OT(acs()->w2);
+        acs(); node *y = NIL; do{
+            x->splay(); if (px == NIL) OT(max(rx->w2, y->w2));
+            rx = y, x->upd();
+            y = x, x = px;
+        } while (x != NIL);
+    }
+
+    void Modify(int d){
+        acs()->w1 = d;
+        // acs()->inc(d);
+    }
+} *NIL, *T[N];
+
+int hd[N], nxt[M], a[M], b[M], w[M], h[M/2];
+// Adjacent list
+int n;
+
+#define v b[i]
+#define w w[i/2]
+
+inline void dfs(int u = 1, int p = 0){
+    for(int i=hd[u];i;i=nxt[i]) if (v != p) {
+        T[v]->p = T[u], T[v]->w1 = w; dfs(h[i>>1] = v, u);
+    }
 }
 
-int main(){
+int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
+    //freopen("out.txt", "w", stdout);
 #endif
-    Rush {
-        RD(n, k); REP_1(i, n) vis[i] = 0, adj[i].clear();
-        DO(n-1) {
-            int a, b, w; RD(a, b, w);
-            adj[a].PB({b,w});
-            adj[b].PB({a,w});
-        }
-        z = 0; nn = n;
-        if (k&1) {
-            --k; gao(); z += patch(rt).fi;
-        } else {
-            gao();
-        }
-        printf("%lld\n", 2*z);
+
+    NIL = new node(); REP_1(i, N) T[i] = new node();
+
+    RD(n); FOR(i, 2, n<<1){
+        RD(a[i], b[i], w), a[i|1] = b[i], b[i|1] = a[i];
+        nxt[i] = hd[a[i]], hd[a[i]] = i; ++i;
+        nxt[i] = hd[a[i]], hd[a[i]] = i;
     }
+
+    dfs();
+
+    char cmd[9]; int a, b; while(1){
+        RS(cmd); if (cmd[0] == 'Q') {
+            RD(a, b); T[a]->Query(T[b]);
+        } else if (cmd[0] == 'C'){
+            RD(a, b); T[h[a]]->Modify(b);
+        } else {
+            break;
+        }
+    }
+}
+*/
+
+
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll inf=123456789123456789ll;
+int n,m,head[100100],cnt;
+struct node{int to,next,val;}edge[200100];
+void ae(int u,int v,int w){
+	edge[cnt].next=head[u],edge[cnt].to=v,edge[cnt].val=w,head[u]=cnt++;
+	edge[cnt].next=head[v],edge[cnt].to=u,edge[cnt].val=w,head[v]=cnt++;
+}
+int fa[100100],dep[100100],son[100100],sz[100100],dfn[100100],rev[100100],top[100100],tot;
+ll dis[100100];
+void dfs1(int x){
+	sz[x]=1;
+	for(int i=head[x];i!=-1;i=edge[i].next){
+		if(edge[i].to==fa[x])continue;
+		fa[edge[i].to]=x,dis[edge[i].to]=dis[x]+edge[i].val,dep[edge[i].to]=dep[x]+1;
+		dfs1(edge[i].to);
+		sz[x]+=sz[edge[i].to];
+		if(sz[edge[i].to]>sz[son[x]])son[x]=edge[i].to;
+	}
+}
+void dfs2(int x){
+	dfn[x]=++tot,rev[tot]=x;if(!top[x])top[x]=x;
+	if(son[x])top[son[x]]=top[x],dfs2(son[x]);
+	for(int i=head[x];i!=-1;i=edge[i].next)if(edge[i].to!=fa[x]&&edge[i].to!=son[x])dfs2(edge[i].to);
+}
+int LCA(int x,int y){while(top[x]!=top[y]){if(dep[top[x]]<dep[top[y]])swap(x,y);x=fa[top[x]];}if(dep[x]>dep[y])swap(x,y);return x;}
+#define lson x<<1
+#define rson x<<1|1
+#define mid ((l+r)>>1)
+namespace FS{//full section
+	ll mn[400100];
+	void build(int x,int l,int r){mn[x]=inf;if(l!=r)build(lson,l,mid),build(rson,mid+1,r);}
+	void modify(int x,int l,int r,int P,ll val){if(l>P||r<P)return;mn[x]=min(mn[x],val);if(l!=r)modify(lson,l,mid,P,val),modify(rson,mid+1,r,P,val);}
+	ll query(int x,int l,int r,int L,int R){if(l>R||r<L)return inf;if(L<=l&&r<=R)return mn[x];return min(query(lson,l,mid,L,R),query(rson,mid+1,r,L,R));}
+}
+namespace BS{//boundary situation
+	struct SegTree{ll b;int k;}seg[400100];
+	void build(int x,int l,int r){seg[x].k=0,seg[x].b=inf;if(l!=r)build(lson,l,mid),build(rson,mid+1,r);}
+	void modify(int x,int l,int r,int L,int R,int K,ll B){
+		if(l>R||r<L)return;
+		if(L<=l&&r<=R){
+			if(dis[rev[mid]]*K+B<dis[rev[mid]]*seg[x].k+seg[x].b)swap(seg[x].k,K),swap(seg[x].b,B);
+			if(dis[rev[l]]*K+B<dis[rev[l]]*seg[x].k+seg[x].b)modify(lson,l,mid,L,R,K,B);
+			if(dis[rev[r]]*K+B<dis[rev[r]]*seg[x].k+seg[x].b)modify(rson,mid+1,r,L,R,K,B);
+			return;
+		}
+		modify(lson,l,mid,L,R,K,B),modify(rson,mid+1,r,L,R,K,B);
+	}
+	ll query(int x,int l,int r,int P){
+		if(l>P||r<P)return inf;
+		ll ret=dis[rev[P]]*seg[x].k+seg[x].b;
+		if(l!=r)ret=min(ret,query(lson,l,mid,P)),ret=min(ret,query(rson,mid+1,r,P));
+		return ret;
+	}
+}
+void modify(int L,int R,int K,ll B){L=dfn[L],R=dfn[R],FS::modify(1,1,n,L,dis[rev[L]]*K+B),FS::modify(1,1,n,R,dis[rev[R]]*K+B),BS::modify(1,1,n,L,R,K,B);}
+ll query(int L,int R){L=dfn[L],R=dfn[R];return min(FS::query(1,1,n,L,R),min(BS::query(1,1,n,L),BS::query(1,1,n,R)));}
+void chain(int x,int y,int K,ll B){while(top[x]!=top[y])modify(top[x],x,K,B),x=fa[top[x]];modify(y,x,K,B);}
+void pathmodify(int x,int y,int A,int B){int z=LCA(x,y);chain(x,z,-A,dis[x]*A+B),chain(y,z,A,(dis[x]-dis[z]*2)*A+B);}
+ll pathquery(int x,int y){
+	ll ret=inf;
+	while(top[x]!=top[y]){
+		if(dep[top[x]]<dep[top[y]])swap(x,y);
+		ret=min(ret,query(top[x],x)),x=fa[top[x]];
+	}
+	if(dep[x]>dep[y])swap(x,y);ret=min(ret,query(x,y));return ret;
+}
+int main(){
+	scanf("%d%d",&n,&m),memset(head,-1,sizeof(head));
+	for(int i=1,x,y,z;i<n;i++)scanf("%d%d%d",&x,&y,&z),ae(x,y,z);
+	dfs1(1),dfs2(1);
+//	for(int x=1;x<=n;x++)printf("FA:%d SN:%d SZ:%d DP:%d DS:%lld RV:%d DF:%d TP:%d\n",fa[x],son[x],sz[x],dep[x],dis[x],rev[x],dfn[x],top[x]);
+	FS::build(1,1,n),BS::build(1,1,n);
+	for(int i=1,x,y,a,b,tp;i<=m;i++){
+		scanf("%d%d%d",&tp,&x,&y);
+		if(tp==1)scanf("%d%d",&a,&b),pathmodify(x,y,a,b);
+		else printf("%lld\n",pathquery(x,y));
+	}
+	return 0;
 }
