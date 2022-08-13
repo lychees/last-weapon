@@ -9,6 +9,7 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 - [https://github.com/not522/ac-library-python](https://github.com/not522/ac-library-python)
 - [https://github.com/hos-lyric/libra](https://github.com/hos-lyric/libra)
 - [https://github.com/kth-competitive-programming/kactl](https://github.com/kth-competitive-programming/kactl)
+- [https://github.com/NyaanNyaan/library](https://github.com/NyaanNyaan/library)
 
 ### Textbook
 - [https://oi-wiki.org](https://oi-wiki.org)

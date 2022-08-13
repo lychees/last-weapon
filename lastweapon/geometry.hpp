@@ -1,15 +1,11 @@
 #ifndef LASTWEAPON_GEOMETRY_HPP
 #define LASTWEAPON_GEOMETRY_HPP 1
-
 #include "lastweapon/io"
-
+inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
+inline DB cot(DB x){return 1./tan(x);};
+inline DB sec(DB x){return 1./cos(x);};
+inline DB csc(DB x){return 1./sin(x);};
 namespace lastweapon {
-
-    inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
-    inline DB cot(DB x){return 1./tan(x);};
-    inline DB sec(DB x){return 1./cos(x);};
-    inline DB csc(DB x){return 1./sin(x);};
-
 namespace CG {
 
 #define cPo const Po&
@@ -426,10 +422,10 @@ namespace CG {
             Line l0(0,Li->se,1,Li->fi+Li->se);
 
             ECH(Pi, P){
-                int i; FOR_N(i, 1, SZ(Pi->P)) if (equal(*Li, Seg(Pi->P[i-1], Pi->P[i]))) break;
+                int i; for(i=1;i<SZ(Pi->P);++i) if (equal(*Li, Seg(Pi->P[i-1], Pi->P[i]))) break;
                 if (i != SZ(Pi->P)) continue;
 
-                VP cut; FOR_N(i, 1, SZ(Pi->P)){
+                VP cut; for(i=1;i<SZ(Pi->P);++i) {
                     Seg l1(Pi->P[i-1], Pi->P[i]); if (!dett(l0,l1)) continue;
                     Po p=l0*l1; if (~l1.sgn(p)) cut.PB(p);
                 }

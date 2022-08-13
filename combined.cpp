@@ -1,8 +1,7 @@
-
 /*
-    This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
-    Template Date: 2022.7.22
-    Note: ...
+    Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
+    Repo: https://github.com/lychees/last-weapon
+    Blog: https://www.shuizilong.com/house
 */
 #pragma comment(linker, "/STACK:36777216")
 #define LOCAL
@@ -245,397 +244,683 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 namespace lastweapon {}
-
+inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
+inline DB cot(DB x){return 1./tan(x);};
+inline DB sec(DB x){return 1./cos(x);};
+inline DB csc(DB x){return 1./sin(x);};
 namespace lastweapon {
+namespace CG {
 
-namespace splay {
+#define cPo const Po&
+#define cLine const Line&
+#define cSeg const Seg&
 
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-struct node {
+    inline DB dist2(DB x,DB y){return sqr(x)+sqr(y);}
 
-    static node *NIL; node *c[2], *p;
-    int sz; S d;
+    struct Po{
+        DB x,y;Po(DB x=0,DB y=0):x(x),y(y){}
 
-#define NIL node::NIL
-#define l c[0]
-#define r c[1]
-#define lx x->l
-#define rx x->r
-#define px x->p
-#define ly y->l
-#define ry y->r
-#define py y->p
+        void in(){RF(x,y);}void out(){printf("(%.2f,%.2f)",x,y);}
+        inline friend istream&operator>>(istream&i,Po&p){return i>>p.x>>p.y;}
+        inline friend ostream&operator<<(ostream&o,Po p){return o<<"("<<p.x<<", "<<p.y<< ")";}
 
-    node(S s = e()){d=e();}
-    inline void reset(S s){l=r=p=NIL,d=s;sz=1;}
+        Po operator-()const{return Po(-x,-y);}
+        Po&operator+=(cPo p){x+=p.x,y+=p.y;rTs;}Po&operator-=(cPo p){x-=p.x,y-=p.y;rTs;}
+        Po&operator*=(DB k){x*=k,y*=k;rTs;}Po&operator/=(DB k){x/=k,y/=k;rTs;}
+        Po&operator*=(cPo p){rTs=Ts*p;}Po&operator/=(cPo p){rTs=Ts/p;}
+        Po operator+(cPo p)const{return Po(x+p.x,y+p.y);}Po operator-(cPo p)const{return Po(x-p.x,y-p.y);}
+        Po operator*(DB k)const{return Po(x*k,y*k);}Po operator/(DB k)const{return Po(x/k,y/k);}
+        Po operator*(cPo p)const{return Po(x*p.x-y*p.y,y*p.x+x*p.y);}Po operator/(cPo p)const{return Po(x*p.x+y*p.y,y*p.x-x*p.y)/p.len2();}
 
-    inline void upd(){
-        assert(this != NIL);
-        sz = l->sz + 1 + r->sz;
-        op(d, l->d, r->d);
-    }
-    inline int sgn(){return p->r==this;}
-    inline void setc(int d,node*x){c[d]=x,px=this;}
-    inline void setl(node*x){setc(0,x);}
-    inline void setr(node*x){setc(1,x);}
+        bool operator==(cPo p)const{return!sgn(x,p.x)&&!sgn(y,p.y);};bool operator!=(cPo p)const{return sgn(x,p.x)||sgn(y,p.y);}
+        bool operator<(cPo p)const{return sgn(x,p.x)<0||!sgn(x,p.x)&&sgn(y,p.y)<0;}bool operator<=(cPo p)const{return sgn(x,p.x)<0||!sgn(x,p.x)&&sgn(y,p.y)<=0;}
+        bool operator>(cPo p)const{return!(Ts<=p);}bool operator >=(cPo p)const{return!(Ts<p);}
 
-    inline void rot(int d){
-        node*y=p,*z=py;z->setc(y->sgn(),this);
-        y->setc(d,c[!d]),setc(!d,y),y->upd();
-    }
-    inline void rot(){rot(sgn());}
+        DB len2()const{return dist2(x,y);}DB len()const{return sqrt(len2());}DB arg()const{return atan2(y,x);}
+        Po&_1(){rTs/=len();}Po&conj(){y=-y;rTs;}Po&lt(){swap(x,y),x=-x;rTs;}Po&rt(){swap(x,y),y=-y;rTs;}
+        Po&rot(DB a,cPo o=Po()){Ts-=o;Ts*=Po(cos(a),sin(a));rTs+=o;}
 
 
-    /*inline node* splay(node*t){
-        while (p!=t) rot(); upd();
-        return this;
-    }*/
-
-    inline node*splay(node*t){
-        int a,b;while(p!=t){
-            if (p->p==t){rot();break;}
-            else a=sgn(),b=p->sgn(),(a^b?this:p)->rot(a),rot(b);
+        inline int q()const{
+            return (y > 0 || y == 0 && x >= 0) ? 0 : 1;
+            /*if (x > 0 && y >= 0) return 0;
+             if (x <= 0 && y > 0) return 1;
+             if (x < 0 && y <= 0) return 2;
+             return 3;*/
         }
-        upd();
-        return this;
-    }
-};
+    };
 
+    inline DB dot(DB x1,DB y1,DB x2,DB y2){return x1*x2+y1*y2;}
+    inline DB dot(cPo a,cPo b){return dot(a.x,a.y,b.x,b.y);}
+    inline DB dot(cPo p0,cPo p1,cPo p2){return dot(p1-p0,p2-p0);}
+    inline DB det(DB x1,DB y1,DB x2,DB y2){return x1*y2-x2*y1;}
+    inline DB det(cPo a,cPo b){return det(a.x,a.y,b.x,b.y);}
+    inline DB det(cPo p0,cPo p1,cPo p2){return det(p1-p0,p2-p0);}
+    inline DB ang(cPo p0,cPo p1){return acos(dot(p0,p1)/p0.len()/p1.len());}
+    inline DB ang(cPo p0,cPo p1,cPo p2){return ang(p1-p0,p2-p0);}
+    inline DB ang(cPo p0,cPo p1,cPo p2,cPo p3){return ang(p1-p0,p3-p2);}
+    inline DB dist2(const Po &a, const Po &b){return dist2(a.x-b.x, a.y-b.y);}
+    template<class T1, class T2> inline int dett(const T1 &x, const T2 &y){return sgn(det(x, y));}
+    template<class T1, class T2, class T3> inline int dett(const T1 &x, const T2 &y, const T3 &z){return sgn(det(x, y, z));}
+    template<class T1, class T2, class T3, class T4> inline int dett(const T1 &x, const T2 &y, const T3 &z, const T4 &w){return sgn(det(x, y, z, w));}
+    template<class T1, class T2> inline int dott(const T1 &x, const T2 &y){return sgn(dot(x, y));}
+    template<class T1, class T2, class T3> inline int dott(const T1 &x, const T2 &y, const T3 &z){return sgn(dot(x, y, z));}
+    template<class T1, class T2, class T3, class T4> inline int dott(const T1 &x, const T2 &y, const T3 &z, const T4 &w){return sgn(dot(x, y, z, w));}
+    template<class T1, class T2> inline DB arg(const T1 &x, const T2 &y){DB a=ang(x,y);return~dett(x,y)?a:2*PI-a;}
+    template<class T1, class T2, class T3> inline DB arg(const T1 &x, const T2 &y, const T3 &z){DB a=ang(x,y,z);return~dett(x,y,z)?a:2*PI-a;}
+    template<class T1, class T2, class T3, class T4> inline DB arg(const T1 &x, const T2 &y, const T3 &z, const T4 &w){DB a=ang(x,y,z,w);return~dett(x,y,z,w)?a:2*PI-a;}
+    template<class T1, class T2> inline DB dist(const T1 &x, const T2 &y){return sqrt(dist2(x, y));}
+    template<class T1, class T2, class T3> inline DB dist(const T1 &x, const T2 &y, const T3 &z){return sqrt(dist2(x, y, z));}
+    inline Po _1(Po p){return p._1();}inline Po conj(Po p){return p.conj();}
+    inline Po lt(Po p){return p.lt();}inline Po rt(Po p){return p.rt();}
+    inline Po rot(Po p,DB a,cPo o=Po()){return p.rot(a,o);}
+    inline Po operator *(DB k,cPo p){return p*k;}
+    inline Po operator /(DB k,cPo p){return conj(p)*k/p.len2();}
 
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-struct splay {
+    typedef vector<Po> VP;
 
-#define node node<S, op, e>
+    struct Line{
+        Po a,b;Line(cPo a=Po(),cPo b=Po()):a(a),b(b){}
+        Line(DB x0,DB y0,DB x1,DB y1):a(Po(x0,y0)),b(Po(x1,y1)){}
+        Line(cLine l):a(l.a),b(l.b){}
 
-    std::vector<node> d;
-    int n; node* rt;
-
-    splay() : splay(0) {}
-    explicit splay(int n) : splay(std::vector<S>(n, e())) {}
-    explicit splay(const std::vector<S>& a) : n(int(a.size())) {
-        rt = new node(); rt->reset(0);
-        REP(i, n) {
-            node* t = new node();
-            t->reset(a[i]);
-            t->setl(rt); t->upd();
-            rt = t;
+        Line(DB A,DB B,DB C){
+            C=-C;if(!::sgn(A))a=Po(0,C/B),b=Po(1,C/B);
+            else if(!::sgn(B))a=Po(C/A,0),b=Po(C/A,1);
+            else a=Po(0,C/B),b=Po(1,(C-A)/B);
         }
-        node* t = new node();
-        t->reset(0);
-        t->setl(rt); t->upd();
-        rt = t;
-    }
 
-    node *select(int k, node*t=NIL){
-        node *x = rt; while (lx->sz != k){
-            if (k < lx->sz) x = lx;
-            else k -= lx->sz+1, x = rx;
+        void in(){a.in(),b.in();}
+        inline friend istream&operator>>(istream&i,Line& p){return i>>p.a>>p.b;}
+        inline friend ostream&operator<<(ostream&o,Line p){return o<<p.a<<"-"<< p.b;}
+
+        Line operator+(cPo x)const{return Line(a+x,b+x);}
+        Line operator-(cPo x)const{return Line(a-x,b-x);}
+        Line operator*(DB k)const{return Line(a*k,b*k);}
+        Line operator/(DB k)const{return Line(a/k,b/k);}
+
+        Po operator*(cLine)const;
+        Po d()const{return b-a;}DB len2()const{return d().len2();}DB len()const{return d().len();}DB arg()const{return d().arg();}
+
+        int sgn(cPo p)const{return dett(a, b, p);}
+        int sgn(cLine)const;
+
+        bool sameSgn(cPo  p1,cPo  p2)const{return sgn(p1)==sgn(p2);}
+        void getEquation(DB&K,DB&B)const{
+            K = ::sgn(a.x, b.x) ? (b.y-a.y)/(b.x-a.x) : OO;
+            B = a.y - K*a.x;
         }
-        if (t == NIL) rt = x;
+        void getEquation(DB&A,DB&B,DB&C)const{A=a.y-b.y,B=b.x-a.x,C=det(a, b);}
 
-        return x->splay(t);
-    }
-
-    node *select(int a, int b){
-        return select(a-1, select(b))->r;
-    }
-
-    S prod(int a, int b) {
-        return select(a, b)->d;
-    }
-
-    void set(int p, S s) {
-        node* x = select(p, p+1); x->d = s;
-        while (x->p != NIL) {
-            x = x->p;
-            x->upd();
+        Line&push(DB r){ // 正数右手螺旋向里
+            Po v=d()._1().lt()*r;a+=v,b+=v; rTs;
         }
+    };
+
+    inline DB dot(cLine l1,cLine l2){return dot(l1.d(),l2.d());}
+    inline DB dot(cLine l,cPo p){return dot(l.a,l.b,p);}
+    inline DB dot(cPo p,cLine l){return dot(p,l.a,l.b);}
+    inline DB det(cLine l1,cLine l2){return det(l1.d(),l2.d());}
+    inline DB det(cLine l,cPo p){return det(l.a,l.b,p);}
+    inline DB det(cPo p,cLine l){return det(p,l.a,l.b);}
+    inline DB ang(cLine l0,cLine l1){return ang(l0.d(),l1.d());}
+    inline DB ang(cLine l,cPo p){return ang(l.a,l.b,p);}
+    inline DB ang(cPo p,cLine l){return ang(p,l.a,l.b);}
+
+    inline int Line::sgn(cLine l)const{return dett(Ts, l);}
+    inline Po Line::operator*(cLine l)const{return a+d()*det(a,l)/det(Ts,l);}
+    inline Po operator&(cPo p,cLine l){return l*Line(p,p+l.d().lt());}
+    inline Po operator%(cPo p,cLine l){return p&l*2-p;}
+    inline Line push(Line l, DB r){return l.push(r);}
+
+
+    struct Seg: public Line{
+        Seg(cPo a=Po(),cPo b=Po()):Line(a,b){}
+        Seg(DB x0,DB y0,DB x1,DB y1):Line(x0,y0,x1,y1){}
+        Seg(cLine l):Line(l){}
+        Seg(const Po &a,DB alpha):Line(a,alpha){}
+        Seg(DB A,DB B,DB C):Line(A,B,C){}
+
+        inline int sgn(cPo p)const;
+        inline int sgn(cLine l)const;
+        inline bool qrt(cSeg l)const;
+        inline int sgn(cSeg l)const;
+    };
+
+
+
+    inline int Seg::sgn(cPo p)const{
+        if (dett(p, a, b)) return -1; // 有时会有精度误差。。
+        if (a == p || b == p) return 0;
+        return -dott(p,a,b);
     }
-};
 
-#undef NIL
 
-template <class S, void (*op)(S&, const S, const S), S (*e)()>
-node *node::NIL = new node;
+    inline int Seg::sgn(cLine l)const{return sgn(Ts*l);}
 
-#undef node
-#undef l
-#undef r
-#undef lx
-#undef rx
-#undef px
-#undef ly
-#undef ry
-#undef py
+    inline bool Seg::qrt(cSeg l)const{
+        return min(a.x,b.x)<=max(l.a.x,l.b.x)&&min(l.a.x,l.b.x)<=max(a.x,b.x)&&
+        min(a.y,b.y)<=max(l.a.y,l.b.y)&&min(l.a.y,l.b.y)<=max(a.y,b.y);
+    }
 
-}  // namespace splay
+
+    inline int Seg::sgn(cSeg l)const{
+        if (!qrt(l)) return -1;
+
+        /*return
+         (dett(a,b,l.a)*dett(a,b,l.b)<=0 &&
+         dett(l.a,l.b,a)*dett(l.a,l.b,b)<=0)?1:-1;*/
+
+        int d1=dett(a,b,l.a),d2=dett(a,b,l.b),d3=dett(l.a,l.b,a),d4=dett(l.a,l.b,b);
+        if ((d1^d2)==-2&&(d3^d4)==-2)return 1;
+        return ((!d1&&dott(l.a-a,l.a-b)<=0)||(!d2&&dott(l.b-a,l.b-b)<=0)||
+                (!d3&&dott(a-l.a,a-l.b)<=0)||(!d4&&dott(b-l.a,b-l.b)<=0))?0:-1;
+    }
+
+    inline DB dist2(cLine l,cPo p){return sqr(fabs(det(l.d(), p-l.a)))/l.len2();}
+
+    inline DB dist2(cLine l1,cLine l2){return dett(l1,l2)?0:dist2(l1,l2.a);}
+
+    inline DB dist2(cSeg l,cPo p){
+        Po pa = p - l.a, pb = p - l.b;
+        if (dott(l.d(), pa) <= 0) return pa.len2();
+        if (dott(l.d(), pb) >= 0) return pb.len2();
+        return dist2(Line(l), p);
+    }
+
+
+    inline DB dist2(cSeg s,cLine l){
+        Po v1=s.a-l.a,v2=s.b-l.a;DB d1=det(l.d(),v1),d2=det(l.d(),v2);
+        return sgn(d1)!=sgn(d2) ? 0 : sqr(min(fabs(d1), fabs(d2)))/l.len2();
+    }
+    inline DB dist2(cSeg l1,cSeg l2){
+        if (~l1.sgn(l2)) return 0;
+        else return min(dist2(l2,l1.a), dist2(l2,l1.b), dist2(l1,l2.a), dist2(l1,l2.b));
+    }
+    template<class T1, class T2> inline DB dist2(const T1& a, const T2& b){
+        return dist2(b, a);
+    }
+
+    struct Triangle; struct Circle;
+    typedef const Triangle&cTriangle; typedef const Circle&cCircle;
+
+    const int Disjoint = -2, Exscribe = -1, Cross = 0, Inscribe = 1, Contain = 2;
+
+    Po getX3(cPo a, cPo b, cPo c){ // 外接圆圆心
+        Po v0=b-a,v1=c-a;DB l0=v0.len2(),l1=v1.len2(),d=2*det(a,b,c);
+        return Po(l0*v1.y-l1*v0.y,l1*v0.x-l0*v1.x)/d+a;
+    }
+
+
+
+
+    Po getX4(cPo a, cPo b, cPo c){ // 垂心 // orthocenter
+        return Line(a,a&Line(b,c))*Line(b,b&Line(a,c));
+    }
+
+
+
+    struct Circle{
+        Po o; DB r; Circle(cPo o=Po(),DB r=0):o(o),r(r){}
+        Circle(cPo a,cPo b):o((a+b)/2),r(dist(a,b)/2){}
+        Circle(cLine l):Circle(l.a, l.b){}
+        Circle(cPo a,cPo b,cPo c):o(getX3(a,b,c)),r(dist(o,a)){}
+
+        void in(){o.in(),RF(r);}
+        void out(){printf("%.2f %.2f %.2f\n", o.x, o.y, r);}
+
+        bool operator <(cCircle c)const{return r<c.r;}
+        inline int sgn(cPo p)const{return ::sgn(r*r, dist2(o, p));}
+        inline int sgn(cLine l)const{return ::sgn(r*r, dist2(l, o));}
+        inline int sgn(cCircle c)const{
+            DB d=dist2(o,c.o);
+            if (::sgn(sqr(r+c.r),d)<0) return Disjoint;
+            if (!::sgn(sqr(r+c.r), d)) return Exscribe;
+            if (!::sgn(sqr(r-c.r), d)) return Inscribe;
+            if (::sgn(sqr(r-c.r), d)>0) return Contain;
+            return Cross;
+        }
+
+        inline DB s(){return PI*r*r;}
+        inline DB p(){return 2*PI*r;}
+
+        inline void getIntersect(cLine l,Po&p0,Po&p1)const{
+            Po m = o&l, d = (l.b-l.a)._1() * sqrt(sqr(r)-dist2(l, o));
+            p0 = m + d, p1 = m - d;
+        }
+        inline void getIntersect(cCircle c,Po&p0,Po&p1)const{
+            Po v=(c.o-o)._1()*r;DB a=acos(cos(r,dist(o,c.o),c.r));
+            p0=o+rot(v,a),p1=o+rot(v,-a);
+        }
+
+        inline void getTangency(cPo p,Po&p0,Po&p1)const{
+            DB d=dist(o,p),a=acos(r/d);Po v=(p-o)._1()*r;
+            p0=o+rot(v,a),p1=o+rot(v,-a);
+        }
+
+        inline VP operator*(cLine l)const{
+            VP P; int t = sgn(l); if (t==-1) return P;
+            Po p0, p1; getIntersect(l, p0, p1); P.PB(p0); if (t == 1) P.PB(p1);
+            return P;
+        }
+
+        inline VP operator*(cSeg s)const{
+            VP _P = Ts*Line(s), P; ECH(p, _P) if (~s.sgn(*p)) P.PB((*p));
+            return P;
+        }
+
+        inline Po operator^(cCircle c)const{return Po(det(Po(o.x,r),Po(c.o.x,c.r)),det(Po(o.y,r),Po(c.o.y,c.r)))/(c.r-r);}
+
+        inline VP operator*(cCircle c)const{
+            VP P; int t = abs(sgn(c)); if (t == 2) return P;
+            Po p0, p1; getIntersect(c, p0, p1); P.PB(p0); if (!t) P.PB(p1);
+            return P;
+        }
+    };
+
+    struct Triangle{
+        Po A,B,C; DB a,b,c; DB alpha,beta,theta;
+        DB r,R; DB S,P; Po I,G,O,H;
+
+        void init(){
+            S=fabs(det(A,B,C))/2,a=dist(B,C),b=dist(A,C),c=dist(A,B);
+            alpha=acos(cos(b,c,a)),beta=acos(cos(a,c,b)),theta=acos(cos(a,b,c));
+            P=a+b+c,R=(a*b*c)/(4*S),r=2*S/P;
+            I=Po(a*A.x+b*B.x+c*C.x,a*A.y+b*B.y+c*C.y)/P;
+            G=(A+B+C)/3,O=getX3(A,B,C),H=getX4(A,B,C);
+        }
+
+        void in(){
+            A.in(),B.in(),C.in();init();
+        }
+    };
+
+    Po getPo(){Po p;p.in();return p;}
+    Line getLine(){Line l;l.in();return l;}
+
+    DB getArea(const VP& P){DB z=0;FOR(i,1,SZ(P))z+=det(P[i-1],P[i]);return z;}
+    DB getPeri(const VP& P){DB z=0;FOR(i,1,SZ(P))z+=dist(P[i-1],P[i]);return z;}
+
+
+    VP getCH(VP& P, int b=1){ //逆时针，不保留共线
+
+        int n=SZ(P); if(n<=3) return P.PB(P[0]),getArea(P)<0?RVS(P):P;
+
+        SRT(P); VP C; C.resize(2*n+9); int nn = -1; REP(i, n){ //#
+            while (nn > 0 && dett(C[nn-1], C[nn], P[i]) < b) --nn; //#
+            C[++nn] = P[i];
+        }
+
+        int _nn = nn; DWN(i, n-1, 0){
+            while (nn > _nn && dett(C[nn-1], C[nn], P[i]) < b) --nn; //#
+            C[++nn] = P[i];
+        }
+
+        C.resize(nn+1);
+        return C;
+    }
+
+
+
+    const int HPI_N = 109;
+
+    bool cmpHPI(cLine l,cLine r){
+        int t = sgn(l.arg(), r.arg()); if (!t) t = dett(r.a,l);
+        return t < 0;
+    }
+
+    Line Q[HPI_N]; int cz, op;
+
+    void cut_b(cLine l){while(cz<op&&dett(l,Q[op]*Q[op-1])<0)--op;}
+    void cut_f(cLine l){while(cz<op&&dett(l,Q[cz]*Q[cz+1])<0)++cz;}
+    void cut(cLine l){cut_b(l),cut_f(l),Q[++op]=l;}
+
+    VP getHPI(vector<Line>&L){
+        SRT(L, cmpHPI); int n = 1; FOR(i, 1, SZ(L)) if (sgn(L[i-1].arg(), L[i].arg())) L[n++] = L[i];
+        VP P; cz = 0, op = 1, Q[0] = L[0], Q[1] = L[1]; FOR(i, 2, n){
+            if (!dett(Q[op],Q[op-1])||!dett(Q[cz],Q[cz+1])) return P;
+            cut(L[i]);
+        }
+        cut_b(Q[cz]);cut_f(Q[op]);
+
+        if (op <= cz+1) return P;
+        for (int i=cz;i<op;++i) P.PB(Q[i]*Q[i+1]);
+        if (cz<op+1) P.PB(Q[cz]*Q[op]);
+        UNQQ(P).PB(P[0]);
+        return P;
+    }
+
+
+
+    bool cmpy(cPo a, cPo b){return a.y < b.y;}
+
+    inline DB cp(VP &P, int l, int r){
+        if (l >= r) return OO;
+
+        int m = (l + r) >> 1; DB d = min(cp(P, l, m), cp(P, m+1, r)), mx = P[m].x;
+        inplace_merge(P.begin()+l, P.begin()+m+1, P.begin()+r+1, cmpy);
+
+        VP t; FOR_1(i, l, r) if (sgn(abs(P[i].x - mx), d)<0) t.PB(P[i]);
+        REP(i, SZ(t)) FOR(j, i+1,  min(SZ(t), i+9)) checkMin(d, dist2(t[i], t[j])); //#
+        return d;
+    }
+
+    DB cp(VP& P){
+        UNQ(P);
+        return cp(P, 0, SZ(P)-1);
+    }
+
+
+
+    Circle getMinimalCoverCircle(VP& P){ //#
+        random_shuffle(ALL(P)); int n = SZ(P);
+        Circle C(P[0]); FOR(i, 1, n) if (!~C.sgn(P[i])){
+            C = Circle(P[i]); REP(j, i) if (!~C.sgn(P[j])){
+                C = Circle(P[i], P[j]); REP(k, j) if (!~C.sgn(P[k])){
+                    C = Circle(P[i], P[j], P[k]);
+                }
+            }
+        }
+        return C;
+    }
+
+    struct Polygon{
+        VP P;
+        void input();
+    };
+
+    inline bool equal(const pair<DB, DB>& lhs, cSeg  rhs){
+        DB k, b; rhs.getEquation(k, b);
+        return !sgn(k, lhs.fi) && !sgn(b, lhs.se);
+    }
+
+    DB getUnion(vector<Polygon>& P, vector<Seg>& S){
+
+        vector<pair<DB,DB> > L; ECH(Si, S){
+            DB k, b; Si->getEquation(k, b);
+            L.PB(MP(k, b));
+        }
+
+        UNQ(L); DB res = 0; ECH(Li, L){
+
+            vector<pair<DB, int> > I;
+            Line l0(0,Li->se,1,Li->fi+Li->se);
+
+            ECH(Pi, P){
+                int i; for(i=1;i<SZ(Pi->P);++i) if (equal(*Li, Seg(Pi->P[i-1], Pi->P[i]))) break;
+                if (i != SZ(Pi->P)) continue;
+
+                VP cut; for(i=1;i<SZ(Pi->P);++i) {
+                    Seg l1(Pi->P[i-1], Pi->P[i]); if (!dett(l0,l1)) continue;
+                    Po p=l0*l1; if (~l1.sgn(p)) cut.PB(p);
+                }
+
+                if (SZ(UNQ(cut)) == 2){
+                    I.PB(MP(cut[0].x, 1));
+                    I.PB(MP(cut[1].x, -1));
+                }
+            }
+
+            ECH(Si, S) if (equal(*Li, *Si)){
+                I.PB(MP(min(Si->a.x, Si->b.x), 2));
+                I.PB(MP(max(Si->a.x, Si->b.x), -2));
+            }
+    #define h (I[i].fi-I[i-1].fi)
+    #define y0 (Li->fi * I[i-1].fi + Li->se)
+    #define y1 (Li->fi * I[i].fi + Li->se)
+            SRT(I); int c0 = 0, c1 = 0; REP(i, SZ(I)){
+                if (!c0 && c1) res += (y0+y1)*h;
+                if (abs(I[i].se)==1) c0 += I[i].se;
+                else c1 += I[i].se;
+            }
+    #undef h
+    #undef y0
+    #undef y1
+        }
+
+        return res;
+    }
+
+    DB getUnion(vector<Polygon>& P){
+        vector<Seg> up, down; ECH(it, P){
+            FOR(i, 1, SZ(it->P)){
+                Seg s(it->P[i-1], it->P[i]); int t = sgn(s.a.x, s.b.x);
+                if (t > 0) up.PB(s); else if (t < 0) down.PB(s);
+            }
+        }
+        return getUnion(P, up) - getUnion(P, down);
+    }
+
+
+
+
+    inline DB dist2(DB x,DB y,DB z){return dist2(x,y)+sqr(z);}
+
+    namespace D3{
+        struct Po{
+            DB x,y,z;Po(DB x=0,DB y=0,DB z=0):x(x),y(y),z(z){}
+            void in(){RF(x,y,z);}
+
+            Po operator-()const{return Po(-x,-y,-z);}
+            Po&operator+=(cPo p){x+=p.x,y+=p.y,z+=p.z;rTs;}Po&operator-=(cPo p){x-=p.x,y-=p.y,z-=p.z;rTs;}
+            Po&operator*=(DB k){x*=k,y*=k,z*=k;rTs;}Po&operator/=(DB k){x/=k,y/=k,z/=k;rTs;}
+            Po operator+(cPo p)const{return Po(x+p.x,y+p.y,z+p.z);}Po operator-(cPo p)const{return Po(x-p.x,y-p.y,z-p.z);}
+            Po operator*(DB k)const{return Po(x*k,y*k,z*k);}Po operator/(DB k)const{return Po(x/k,y/k,z/k);}
+
+            DB len2()const{return dist2(x,y,z);}DB len()const{return sqrt(len2());}
+            Po&_1(){rTs/=len();}
+        };
+
+        inline DB dot(DB x1,DB y1,DB z1,DB x2,DB y2,DB z2){return CG::dot(x1,y1,x2,y2)+z1*z2;}
+        inline DB dot(cPo a,cPo b){return dot(a.x,a.y,a.z,b.x,b.y,b.z);}
+        inline DB dot(cPo p0,cPo p1,cPo p2){return dot(p1-p0,p2-p0);}
+        inline Po det(DB x1,DB y1,DB z1,DB x2,DB y2,DB z2){return Po(CG::det(y1,z1,y2,z2),CG::det(z1,x1,z2,x2),CG::det(x1,y1,x2,y2));}
+        inline Po det(cPo a,cPo b){return det(a.x,a.y,a.z,b.x,b.y,b.z);}
+        inline Po det(cPo p0,cPo p1,cPo p2){return det(p1-p0,p2-p0);}
+
+        struct Line{
+            Po a,b;
+        };
+    };
+
+
+} // namespace CG
 
 }  // namespace lastweapon
 
-using namespace lastweapon;
 
-/*
-const int N = int(1e5) + 9, M = N*2;
-
-struct node{
-
-    static node* NIL; node *c[2], *p;
-    int w1, w2, d0; bool r0;
-
-#define NIL node::NIL
-#define l c[0]
-#define r c[1]
-#define lx x->l
-#define rx x->r
-#define px x->p
-#define ly y->l
-#define ry y->r
-#define py y->p
-
-    void reset(){
-        l = r = p = NIL;
-        w1 = w2 = d0 = r0 = 0;
-    }
-
-    inline node(){
-        reset();
-    }
-
-    inline void rev(){
-        r0 ^= 1, swap(l, r);
-    }
-
-    inline void inc(int d){
-        if (this == NIL) return;
-        w1 += d, w2 += d, d0 += d;
-    }
-
-    inline void upd(){
-        w2 = max(l->w2, w1, r->w2);
-    }
-
-    inline void rls(){
-        //if (this == NIL) return;
-        if (r0){
-            l->rev(), r->rev();
-            r0 = 0;
-        }
-        if (d0){
-            l->inc(d0), r->inc(d0);
-            d0 = 0;
-        }
-    }
-
-    // 旋转
-
-    inline int sgn(){return p->l==this?0:p->r==this?1:-1;}
-    inline void setc(int d,node*x){c[d]=x,px=this;}
-
-    inline void rot(int d){
-        node *y = p, *z = py; if (~y->sgn()) z->setc(y->sgn(), this); else p = z;
-        y->setc(!d, c[d]), setc(d, y), y->upd();
-    }
-
-    inline void rot(){rot(!sgn());}
-    inline void zag(){rot(0);}
-    inline void zig(){rot(1);}
-
-    // 伸展
-
-    inline void fix(){if(~sgn()) p->fix(); rls();}
+#include <cassert>
+#include <vector>
 
 
-    inline node* splay(){
-        fix(); while (~sgn()) rot(); upd();
-        return this;
-    }
+#include <cassert>
+#include <numeric>
+#include <type_traits>
 
-    inline node* splay(){
-        fix(); while (sgn() != -1){
-            node *y = p, *z = py; if (y->sgn() == -1){ rot(); break;}
-            if (z->l == y){
-                if (y->l == this) y->zig(), zig();
-                else zag(), zig();
-            }else{
-                if (y->r == this) y->zag(), zag();
-                else zig(), zag();
-            }
-        }
-        upd();
-        return this;
-    }
+namespace lastweapon {
 
-    inline node* acs(){
-        node *x = this, *y = NIL; do{
-            x->splay();
-            rx = y, x->upd();
-            y = x, x = px;
-        } while (x != NIL);
-        return splay();
-    }
+namespace internal {
 
-    node* rt(){node* x; for (x = acs(); x->rls(), lx != NIL; x = lx); return x->splay();}
-    node* ert(){acs()->rev(); return this;}
+#ifndef _MSC_VER
+template <class T>
+using is_signed_int128 =
+    typename std::conditional<std::is_same<T, __int128_t>::value ||
+                                  std::is_same<T, __int128>::value,
+                              std::true_type,
+                              std::false_type>::type;
 
+template <class T>
+using is_unsigned_int128 =
+    typename std::conditional<std::is_same<T, __uint128_t>::value ||
+                                  std::is_same<T, unsigned __int128>::value,
+                              std::true_type,
+                              std::false_type>::type;
 
-    void Link(node *x){
-        if (rt() == x->rt()){
-            puts("-1");
-        }
-        else {
-            ert(), p = x;
-        }
-    }
+template <class T>
+using make_unsigned_int128 =
+    typename std::conditional<std::is_same<T, __int128_t>::value,
+                              __uint128_t,
+                              unsigned __int128>;
 
-    void Cut(){
-        acs(); l->p = NIL; l = NIL;
-    }
+template <class T>
+using is_integral = typename std::conditional<std::is_integral<T>::value ||
+                                                  is_signed_int128<T>::value ||
+                                                  is_unsigned_int128<T>::value,
+                                              std::true_type,
+                                              std::false_type>::type;
 
-    void Cut(node* x){
-        if (this == x || rt() != x->rt()){
-            puts("-1");
-        }
-        else {
-            ert(), x->Cut();
-        }
-    }
+template <class T>
+using is_signed_int = typename std::conditional<(is_integral<T>::value &&
+                                                 std::is_signed<T>::value) ||
+                                                    is_signed_int128<T>::value,
+                                                std::true_type,
+                                                std::false_type>::type;
 
-    void Query(node* x){
-        // x->ert(); OT(acs()->w2);
-        acs(); node *y = NIL; do{
-            x->splay(); if (px == NIL) OT(max(rx->w2, y->w2));
-            rx = y, x->upd();
-            y = x, x = px;
-        } while (x != NIL);
-    }
+template <class T>
+using is_unsigned_int =
+    typename std::conditional<(is_integral<T>::value &&
+                               std::is_unsigned<T>::value) ||
+                                  is_unsigned_int128<T>::value,
+                              std::true_type,
+                              std::false_type>::type;
 
-    void Modify(int d){
-        acs()->w1 = d;
-        // acs()->inc(d);
-    }
-} *NIL, *T[N];
+template <class T>
+using to_unsigned = typename std::conditional<
+    is_signed_int128<T>::value,
+    make_unsigned_int128<T>,
+    typename std::conditional<std::is_signed<T>::value,
+                              std::make_unsigned<T>,
+                              std::common_type<T>>::type>::type;
 
-int hd[N], nxt[M], a[M], b[M], w[M], h[M/2];
-// Adjacent list
-int n;
+#else
 
-#define v b[i]
-#define w w[i/2]
+template <class T> using is_integral = typename std::is_integral<T>;
 
-inline void dfs(int u = 1, int p = 0){
-    for(int i=hd[u];i;i=nxt[i]) if (v != p) {
-        T[v]->p = T[u], T[v]->w1 = w; dfs(h[i>>1] = v, u);
-    }
-}
+template <class T>
+using is_signed_int =
+    typename std::conditional<is_integral<T>::value && std::is_signed<T>::value,
+                              std::true_type,
+                              std::false_type>::type;
 
-int main() {
-#ifndef ONLINE_JUDGE
-    freopen("in.txt", "r", stdin);
-    //freopen("out.txt", "w", stdout);
+template <class T>
+using is_unsigned_int =
+    typename std::conditional<is_integral<T>::value &&
+                                  std::is_unsigned<T>::value,
+                              std::true_type,
+                              std::false_type>::type;
+
+template <class T>
+using to_unsigned = typename std::conditional<is_signed_int<T>::value,
+                                              std::make_unsigned<T>,
+                                              std::common_type<T>>::type;
+
 #endif
 
-    NIL = new node(); REP_1(i, N) T[i] = new node();
+template <class T>
+using is_signed_int_t = std::enable_if_t<is_signed_int<T>::value>;
 
-    RD(n); FOR(i, 2, n<<1){
-        RD(a[i], b[i], w), a[i|1] = b[i], b[i|1] = a[i];
-        nxt[i] = hd[a[i]], hd[a[i]] = i; ++i;
-        nxt[i] = hd[a[i]], hd[a[i]] = i;
-    }
+template <class T>
+using is_unsigned_int_t = std::enable_if_t<is_unsigned_int<T>::value>;
 
-    dfs();
+template <class T> using to_unsigned_t = typename to_unsigned<T>::type;
 
-    char cmd[9]; int a, b; while(1){
-        RS(cmd); if (cmd[0] == 'Q') {
-            RD(a, b); T[a]->Query(T[b]);
-        } else if (cmd[0] == 'C'){
-            RD(a, b); T[h[a]]->Modify(b);
-        } else {
-            break;
+}  // namespace internal
+
+}  // namespace lastweapon
+
+
+namespace lastweapon {
+
+template <class T> struct fenwick_tree {
+    using U = internal::to_unsigned_t<T>;
+
+  public:
+    fenwick_tree() : _n(0) {}
+    explicit fenwick_tree(int n) : _n(n), data(n) {}
+
+    void add(int p, T x) {
+        assert(0 <= p && p < _n);
+        p++;
+        while (p <= _n) {
+            data[p - 1] += U(x);
+            p += p & -p;
         }
     }
-}
-*/
+
+    T sum(int l, int r) {
+        assert(0 <= l && l <= r && r <= _n);
+        return sum(r) - sum(l);
+    }
+
+  private:
+    int _n;
+    std::vector<U> data;
+
+    U sum(int r) {
+        U s = 0;
+        while (r > 0) {
+            s += data[r - 1];
+            r -= r & -r;
+        }
+        return s;
+    }
+};
+
+}  // namespace lastweapon
 
 
-#include<bits/stdc++.h>
-using namespace std;
-typedef long long ll;
-const ll inf=123456789123456789ll;
-int n,m,head[100100],cnt;
-struct node{int to,next,val;}edge[200100];
-void ae(int u,int v,int w){
-	edge[cnt].next=head[u],edge[cnt].to=v,edge[cnt].val=w,head[u]=cnt++;
-	edge[cnt].next=head[v],edge[cnt].to=u,edge[cnt].val=w,head[v]=cnt++;
+using namespace lastweapon;
+using namespace CG;
+
+const int N = int(5e4) + 9;
+DB d[N]; Line L[N];
+int n, K;
+
+int f(DB r) {
+    Circle C(Po(0, 0), r); r *= r;
+    vector<pair<double, int>> P; int m = 0;
+    REP(i, n) if (d[i] < r){
+        Po p0, p1; C.getIntersect(L[i], p0, p1);
+        P.PB({p0.arg(), m}); P.PB({p1.arg(), m});
+        ++m;
+    }
+
+    int z = 0; VI l(m, -1); fenwick_tree<int> T(m*2); SRT(P);
+    REP(i, m*2) {
+        int x = P[i].se;
+        if (~l[x]) {
+            T.add(l[x], -1);
+            z += T.sum(l[x], i);
+        } else {
+            T.add(l[x] = i, 1);
+        }
+    }
+    return z;
 }
-int fa[100100],dep[100100],son[100100],sz[100100],dfn[100100],rev[100100],top[100100],tot;
-ll dis[100100];
-void dfs1(int x){
-	sz[x]=1;
-	for(int i=head[x];i!=-1;i=edge[i].next){
-		if(edge[i].to==fa[x])continue;
-		fa[edge[i].to]=x,dis[edge[i].to]=dis[x]+edge[i].val,dep[edge[i].to]=dep[x]+1;
-		dfs1(edge[i].to);
-		sz[x]+=sz[edge[i].to];
-		if(sz[edge[i].to]>sz[son[x]])son[x]=edge[i].to;
-	}
-}
-void dfs2(int x){
-	dfn[x]=++tot,rev[tot]=x;if(!top[x])top[x]=x;
-	if(son[x])top[son[x]]=top[x],dfs2(son[x]);
-	for(int i=head[x];i!=-1;i=edge[i].next)if(edge[i].to!=fa[x]&&edge[i].to!=son[x])dfs2(edge[i].to);
-}
-int LCA(int x,int y){while(top[x]!=top[y]){if(dep[top[x]]<dep[top[y]])swap(x,y);x=fa[top[x]];}if(dep[x]>dep[y])swap(x,y);return x;}
-#define lson x<<1
-#define rson x<<1|1
-#define mid ((l+r)>>1)
-namespace FS{//full section
-	ll mn[400100];
-	void build(int x,int l,int r){mn[x]=inf;if(l!=r)build(lson,l,mid),build(rson,mid+1,r);}
-	void modify(int x,int l,int r,int P,ll val){if(l>P||r<P)return;mn[x]=min(mn[x],val);if(l!=r)modify(lson,l,mid,P,val),modify(rson,mid+1,r,P,val);}
-	ll query(int x,int l,int r,int L,int R){if(l>R||r<L)return inf;if(L<=l&&r<=R)return mn[x];return min(query(lson,l,mid,L,R),query(rson,mid+1,r,L,R));}
-}
-namespace BS{//boundary situation
-	struct SegTree{ll b;int k;}seg[400100];
-	void build(int x,int l,int r){seg[x].k=0,seg[x].b=inf;if(l!=r)build(lson,l,mid),build(rson,mid+1,r);}
-	void modify(int x,int l,int r,int L,int R,int K,ll B){
-		if(l>R||r<L)return;
-		if(L<=l&&r<=R){
-			if(dis[rev[mid]]*K+B<dis[rev[mid]]*seg[x].k+seg[x].b)swap(seg[x].k,K),swap(seg[x].b,B);
-			if(dis[rev[l]]*K+B<dis[rev[l]]*seg[x].k+seg[x].b)modify(lson,l,mid,L,R,K,B);
-			if(dis[rev[r]]*K+B<dis[rev[r]]*seg[x].k+seg[x].b)modify(rson,mid+1,r,L,R,K,B);
-			return;
-		}
-		modify(lson,l,mid,L,R,K,B),modify(rson,mid+1,r,L,R,K,B);
-	}
-	ll query(int x,int l,int r,int P){
-		if(l>P||r<P)return inf;
-		ll ret=dis[rev[P]]*seg[x].k+seg[x].b;
-		if(l!=r)ret=min(ret,query(lson,l,mid,P)),ret=min(ret,query(rson,mid+1,r,P));
-		return ret;
-	}
-}
-void modify(int L,int R,int K,ll B){L=dfn[L],R=dfn[R],FS::modify(1,1,n,L,dis[rev[L]]*K+B),FS::modify(1,1,n,R,dis[rev[R]]*K+B),BS::modify(1,1,n,L,R,K,B);}
-ll query(int L,int R){L=dfn[L],R=dfn[R];return min(FS::query(1,1,n,L,R),min(BS::query(1,1,n,L),BS::query(1,1,n,R)));}
-void chain(int x,int y,int K,ll B){while(top[x]!=top[y])modify(top[x],x,K,B),x=fa[top[x]];modify(y,x,K,B);}
-void pathmodify(int x,int y,int A,int B){int z=LCA(x,y);chain(x,z,-A,dis[x]*A+B),chain(y,z,A,(dis[x]-dis[z]*2)*A+B);}
-ll pathquery(int x,int y){
-	ll ret=inf;
-	while(top[x]!=top[y]){
-		if(dep[top[x]]<dep[top[y]])swap(x,y);
-		ret=min(ret,query(top[x],x)),x=fa[top[x]];
-	}
-	if(dep[x]>dep[y])swap(x,y);ret=min(ret,query(x,y));return ret;
-}
+
 int main(){
-	scanf("%d%d",&n,&m),memset(head,-1,sizeof(head));
-	for(int i=1,x,y,z;i<n;i++)scanf("%d%d%d",&x,&y,&z),ae(x,y,z);
-	dfs1(1),dfs2(1);
-//	for(int x=1;x<=n;x++)printf("FA:%d SN:%d SZ:%d DP:%d DS:%lld RV:%d DF:%d TP:%d\n",fa[x],son[x],sz[x],dep[x],dis[x],rev[x],dfn[x],top[x]);
-	FS::build(1,1,n),BS::build(1,1,n);
-	for(int i=1,x,y,a,b,tp;i<=m;i++){
-		scanf("%d%d%d",&tp,&x,&y);
-		if(tp==1)scanf("%d%d",&a,&b),pathmodify(x,y,a,b);
-		else printf("%lld\n",pathquery(x,y));
-	}
-	return 0;
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+#endif
+
+    RD(n, K); REP(i, n) {
+        int A,B,C; RD(A,B,C);
+        if (!A)
+            L[i] = Line(Po(0, (DB)-C/B), Po(1, (DB)-C/B));
+        else if (!B)
+            L[i] = Line(Po((DB)-C/A, 0), Po((DB)-C/A, 1));
+        else if (!C)
+            L[i] = Line(Po(0, 0), Po(-B, A));
+        else
+            L[i] = Line(Po((DB)-C/A, 0), Po(0, (DB)-C/B));
+        d[i] = dist2(L[i], Po(0, 0));
+    }
+
+    DB l = 0, r = 1e7;
+    DO(233) {
+        DB m = (l + r) / 2;
+        if (f(m) < K) l = m;
+        else r = m;
+    }
+    printf("%.9f\n", l);
 }

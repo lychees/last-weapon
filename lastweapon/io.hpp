@@ -1,9 +1,9 @@
 #ifndef LASTWEAPON_IO_HPP
 #define LASTWEAPON_IO_HPP 1
 /*
-    This code has been written by MinakoKojima, feel free to ask me question. Blog: http://www.shuizilong.com/house
-    Template Date: 2022.7.22
-    Note: ...
+    Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
+    Repo: https://github.com/lychees/last-weapon
+    Blog: https://www.shuizilong.com/house
 */
 #pragma comment(linker, "/STACK:36777216")
 //#pragma GCC optimize ("O2")
