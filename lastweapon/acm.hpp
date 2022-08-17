@@ -34,13 +34,13 @@ template <size_t N, size_t Z, int (*ctoi)(char c)> struct acm {
         }
     }
 
-    void insert(char str[]){
+    int insert(char str[]){
         int u = 0; REP_S(cur, str) {
             int c = ctoi(*cur);
             if (!v) v = new_node();
             u = v;
         }
-        ++cnt[u];
+        return u;
     }
 
 #define vis Q

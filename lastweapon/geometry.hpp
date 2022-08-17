@@ -2,10 +2,9 @@
 #define LASTWEAPON_GEOMETRY_HPP 1
 #include "lastweapon/io"
 inline DB cos(DB a, DB b, DB c){return (sqr(a)+sqr(b)-sqr(c))/(2*a*b);}
-inline DB cot(DB x){return 1./tan(x);};
-inline DB sec(DB x){return 1./cos(x);};
-inline DB csc(DB x){return 1./sin(x);};
+
 namespace lastweapon {
+
 namespace CG {
 
 #define cPo const Po&
@@ -13,6 +12,7 @@ namespace CG {
 #define cSeg const Seg&
 
     inline DB dist2(DB x,DB y){return sqr(x)+sqr(y);}
+
 
     struct Po{
         DB x,y;Po(DB x=0,DB y=0):x(x),y(y){}
@@ -38,7 +38,7 @@ namespace CG {
         Po&rot(DB a,cPo o=Po()){Ts-=o;Ts*=Po(cos(a),sin(a));rTs+=o;}
 
 
-        // ÇóËùÔÚÏóÏÞ£¬´ó²¿·ÖÇé¿öÏÂÖ»Çø·ÖÁ½¸ö×ã¹»¡£
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ£ï¿½ï¿½ó²¿·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ã¹»ï¿½ï¿½
         inline int q()const{
             return (y > 0 || y == 0 && x >= 0) ? 0 : 1;
             /*if (x > 0 && y >= 0) return 0;
@@ -111,7 +111,7 @@ namespace CG {
         }
         void getEquation(DB&A,DB&B,DB&C)const{A=a.y-b.y,B=b.x-a.x,C=det(a, b);}
 
-        Line&push(DB r){ // ÕýÊýÓÒÊÖÂÝÐýÏòÀï
+        Line&push(DB r){ // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             Po v=d()._1().lt()*r;a+=v,b+=v; rTs;
         }
     };
@@ -146,12 +146,12 @@ namespace CG {
         inline int sgn(cSeg l)const;
     };
 
-    // -1²»Ïà½» 0Ïà½»£¨²»¹æ·¶£© 1Ïà½»£¨¹æ·¶£©
+    // -1ï¿½ï¿½ï¿½à½» 0ï¿½à½»ï¿½ï¿½ï¿½ï¿½ï¿½æ·¶ï¿½ï¿½ 1ï¿½à½»ï¿½ï¿½ï¿½æ·¶ï¿½ï¿½
 
     //inline int Seg::sgn(cPo p)const{return -dott(p,a,b);}
 
     inline int Seg::sgn(cPo p)const{
-        if (dett(p, a, b)) return -1; // ÓÐÊ±»áÓÐ¾«¶ÈÎó²î¡£¡£
+        if (dett(p, a, b)) return -1; // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½ï¿½î¡£ï¿½ï¿½
         if (a == p || b == p) return 0;
         return -dott(p,a,b);
     }
@@ -209,7 +209,7 @@ namespace CG {
 
     const int Disjoint = -2, Exscribe = -1, Cross = 0, Inscribe = 1, Contain = 2;
 
-    Po getX3(cPo a, cPo b, cPo c){ // Íâ½ÓÔ²Ô²ÐÄ
+    Po getX3(cPo a, cPo b, cPo c){ // ï¿½ï¿½ï¿½Ô²Ô²ï¿½ï¿½
         Po v0=b-a,v1=c-a;DB l0=v0.len2(),l1=v1.len2(),d=2*det(a,b,c);
         return Po(l0*v1.y-l1*v0.y,l1*v0.x-l0*v1.x)/d+a;
         //Po v0 = b-a, v1 = c-a, m0 = (a+b)/2, m1 = (a+c)/2;
@@ -219,7 +219,7 @@ namespace CG {
 
 
 
-    Po getX4(cPo a, cPo b, cPo c){ // ´¹ÐÄ // orthocenter
+    Po getX4(cPo a, cPo b, cPo c){ // ï¿½ï¿½ï¿½ï¿½ // orthocenter
         return Line(a,a&Line(b,c))*Line(b,b&Line(a,c));
     }
 
@@ -235,11 +235,11 @@ namespace CG {
         void out(){printf("%.2f %.2f %.2f\n", o.x, o.y, r);}
 
         bool operator <(cCircle c)const{return r<c.r;}
-        //-1ÏàÀë 0Ô²ÉÏ 1°üº¬
+        //-1ï¿½ï¿½ï¿½ï¿½ 0Ô²ï¿½ï¿½ 1ï¿½ï¿½ï¿½ï¿½
         inline int sgn(cPo p)const{return ::sgn(r*r, dist2(o, p));}
-        //-1ÏàÀë 0ÏàÇÐ 1Ïà½»
+        //-1ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ 1ï¿½à½»
         inline int sgn(cLine l)const{return ::sgn(r*r, dist2(l, o));}
-        // -2ÍâÀë -1ÍâÇÐ 0Ïà½» 1ÄÚÇÐ 2°üº¬
+        // -2ï¿½ï¿½ï¿½ï¿½ -1ï¿½ï¿½ï¿½ï¿½ 0ï¿½à½» 1ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ï¿½ï¿½
         inline int sgn(cCircle c)const{
             DB d=dist2(o,c.o);
             if (::sgn(sqr(r+c.r),d)<0) return Disjoint;
@@ -296,7 +296,7 @@ namespace CG {
             P=a+b+c,R=(a*b*c)/(4*S),r=2*S/P;
             I=Po(a*A.x+b*B.x+c*C.x,a*A.y+b*B.y+c*C.y)/P;
             G=(A+B+C)/3,O=getX3(A,B,C),H=getX4(A,B,C);
-            //DB s=P/2; assert(!sgn(S, sqrt(s*(s-a)*(s-b)*(s-c)))); // º£Â×¹«Ê½
+            //DB s=P/2; assert(!sgn(S, sqrt(s*(s-a)*(s-b)*(s-c)))); // ï¿½ï¿½ï¿½×¹ï¿½Ê½
             //assert(!sgn(dist(I,O), sqrt(R*(R-2*r))));
             //assert(!sgn(dist(H,G), dist(O,H)*2/3));
         }
@@ -313,8 +313,8 @@ namespace CG {
     DB getPeri(const VP& P){DB z=0;FOR(i,1,SZ(P))z+=dist(P[i-1],P[i]);return z;}
 
 
-    // Í¹°ü
-    VP getCH(VP& P, int b=1){ //ÄæÊ±Õë£¬²»±£Áô¹²Ïß
+    // Í¹ï¿½ï¿½
+    VP getCH(VP& P, int b=1){ //ï¿½ï¿½Ê±ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
         int n=SZ(P); if(n<=3) return P.PB(P[0]),getArea(P)<0?RVS(P):P;
 
@@ -333,7 +333,7 @@ namespace CG {
     }
 
 
-    // °ëÆ½Ãæ½»
+    // ï¿½ï¿½Æ½ï¿½æ½»
 
     const int HPI_N = 109;
 
@@ -364,7 +364,7 @@ namespace CG {
     }
 
 
-    // ·ÖÖÎ - ×î½üÆ½Ãæµã¶Ô
+    // ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½
 
     bool cmpy(cPo a, cPo b){return a.y < b.y;}
 
@@ -385,7 +385,7 @@ namespace CG {
     }
 
 
-    // ×îÐ¡¸²¸ÇÔ²
+    // ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ô²
 
     Circle getMinimalCoverCircle(VP& P){ //#
         random_shuffle(ALL(P)); int n = SZ(P);
