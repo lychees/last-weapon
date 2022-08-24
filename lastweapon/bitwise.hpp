@@ -1,8 +1,6 @@
 #ifndef LASTWEAPON_BITWISE_HPP
 #define LASTWEAPON_BITWISE_HPP 1
-
 #include "lastweapon/io"
-
 namespace lastweapon {
 
 inline bool _1(int x, int i){return bool(x&1<<i);}

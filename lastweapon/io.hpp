@@ -214,6 +214,31 @@ template<class T> T abs(T x){return x>0?x:-x;}
 inline int sgn(DB x){return x < -EPS ? -1 : x > EPS;}
 inline int sgn(DB x, DB y){return sgn(x - y);}
 
+template<typename T1, typename T2> istream& operator>>(istream& in, pair<T1, T2>& a) {
+    in >> a.fi >> a.se;
+    return in;
+}
+template<typename T, size_t N> istream& operator>>(istream& in, array<T, N>& a) {
+    REP(i, N) cin >> a[i];
+    return in;
+}
+template<typename T> istream& operator>>(istream& in, vector<T>& a) {
+    REP(i, SZ(a)) in >> a[i];
+    return in;
+}
+template<typename T1, typename T2> ostream& operator<<(ostream& out, pair<T1, T2>& a) {
+    out << a.fi << " " << a.se;
+    return out;
+}
+template<typename T, size_t N> ostream& operator<<(ostream& out, array<T, N>& a) {
+    REP(i, N-1) out << a[i] << " "; if (N) out << a.back();
+    return out;
+}
+template<typename T> ostream& operator<<(ostream& out, vector<T>& a) {
+    REP(i, SZ(a)-1) out << a[i] << " "; if (SZ(a)) out << a.back();
+    return out;
+}
+
 //}
 
 //}

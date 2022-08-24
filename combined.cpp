@@ -1,3 +1,4 @@
+
 /*
     Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
     Repo: https://github.com/lychees/last-weapon
@@ -204,6 +205,31 @@ template<class T> T abs(T x){return x>0?x:-x;}
 inline int sgn(DB x){return x < -EPS ? -1 : x > EPS;}
 inline int sgn(DB x, DB y){return sgn(x - y);}
 
+template<typename T1, typename T2> istream& operator>>(istream& in, pair<T1, T2>& a) {
+    in >> a.fi >> a.se;
+    return in;
+}
+template<typename T, size_t N> istream& operator>>(istream& in, array<T, N>& a) {
+    REP(i, N) cin >> a[i];
+    return in;
+}
+template<typename T> istream& operator>>(istream& in, vector<T>& a) {
+    REP(i, SZ(a)) in >> a[i];
+    return in;
+}
+template<typename T1, typename T2> ostream& operator<<(ostream& out, pair<T1, T2>& a) {
+    out << a.fi << " " << a.se;
+    return out;
+}
+template<typename T, size_t N> ostream& operator<<(ostream& out, array<T, N>& a) {
+    REP(i, N-1) out << a[i] << " "; if (N) out << a.back();
+    return out;
+}
+template<typename T> ostream& operator<<(ostream& out, vector<T>& a) {
+    REP(i, SZ(a)-1) out << a[i] << " "; if (SZ(a)) out << a.back();
+    return out;
+}
+
 
 
 
@@ -245,139 +271,91 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
 }
 namespace lastweapon {}
 
-#include <algorithm>
-#include <cassert>
-#include <vector>
-
 namespace lastweapon {
 
-struct dsu {
-  public:
-    dsu() : _n(0) {}
-    explicit dsu(int n) : _n(n), parent_or_size(n, -1) {}
+inline bool _1(int x, int i){return bool(x&1<<i);}
+inline bool _1(LL x, int i){return bool(x&1LL<<i);}
+inline LL _1(int i){return 1LL<<i;}
+inline LL _U(int i){return _1(i) - 1;};
 
-    int merge(int a, int b) {
-        assert(0 <= a && a < _n);
-        assert(0 <= b && b < _n);
-        int x = leader(a), y = leader(b);
-        if (x == y) return x;
-        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
-        parent_or_size[x] += parent_or_size[y];
-        parent_or_size[y] = x;
-        return x;
-    }
+inline int reverse_bits(int x){
+    x = ((x >> 1) & 0x55555555) | ((x << 1) & 0xaaaaaaaa);
+    x = ((x >> 2) & 0x33333333) | ((x << 2) & 0xcccccccc);
+    x = ((x >> 4) & 0x0f0f0f0f) | ((x << 4) & 0xf0f0f0f0);
+    x = ((x >> 8) & 0x00ff00ff) | ((x << 8) & 0xff00ff00);
+    x = ((x >>16) & 0x0000ffff) | ((x <<16) & 0xffff0000);
+    return x;
+}
 
-    bool same(int a, int b) {
-        assert(0 <= a && a < _n);
-        assert(0 <= b && b < _n);
-        return leader(a) == leader(b);
-    }
+inline LL reverse_bits(LL x){
+    x = ((x >> 1) & 0x5555555555555555LL) | ((x << 1) & 0xaaaaaaaaaaaaaaaaLL);
+    x = ((x >> 2) & 0x3333333333333333LL) | ((x << 2) & 0xccccccccccccccccLL);
+    x = ((x >> 4) & 0x0f0f0f0f0f0f0f0fLL) | ((x << 4) & 0xf0f0f0f0f0f0f0f0LL);
+    x = ((x >> 8) & 0x00ff00ff00ff00ffLL) | ((x << 8) & 0xff00ff00ff00ff00LL);
+    x = ((x >>16) & 0x0000ffff0000ffffLL) | ((x <<16) & 0xffff0000ffff0000LL);
+    x = ((x >>32) & 0x00000000ffffffffLL) | ((x <<32) & 0xffffffff00000000LL);
+    return x;
+}
 
-    int leader(int a) {
-        assert(0 <= a && a < _n);
-        if (parent_or_size[a] < 0) return a;
-        return parent_or_size[a] = leader(parent_or_size[a]);
-    }
+template<class T> inline bool odd(T x){return x&1;}
+template<class T> inline bool even(T x){return !odd(x);}
+template<class T> inline T low_bit(T x) {return x & -x;}
+template<class T> inline T high_bit(T x) {T p = low_bit(x);while (p != x) x -= p, p = low_bit(x);return p;}
+template<class T> inline T cover_bit(T x){T p = 1; while (p < x) p <<= 1;return p;}
+template<class T> inline int cover_idx(T x){int p = 0; while (_1(p) < x ) ++p; return p;}
 
-    int size(int a) {
-        assert(0 <= a && a < _n);
-        return -parent_or_size[leader(a)];
-    }
+inline int clz(int x){return __builtin_clz(x);}
+inline int clz(LL x){return __builtin_clzll(x);}
+inline int ctz(int x){return __builtin_ctz(x);}
+inline int ctz(LL x){return __builtin_ctzll(x);}
+inline int lg2(int x){return !x ? -1 : 31 - clz(x);}
+inline int lg2(LL x){return !x ? -1 : 63 - clz(x);}
+inline int low_idx(int x){return !x ? -1 : ctz(x);}
+inline int low_idx(LL x){return !x ? -1 : ctz(x);}
+inline int high_idx(int x){return lg2(x);}
+inline int high_idx(LL x){return lg2(x);}
+inline int parity(int x){return __builtin_parity(x);}
+inline int parity(LL x){return __builtin_parityll(x);}
+inline int count_bits(int x){return __builtin_popcount(x);}
+inline int count_bits(LL x){return __builtin_popcountll(x);}
 
-    std::vector<std::vector<int>> groups() {
-        std::vector<int> leader_buf(_n), group_size(_n);
-        for (int i = 0; i < _n; i++) {
-            leader_buf[i] = leader(i);
-            group_size[leader_buf[i]]++;
-        }
-        std::vector<std::vector<int>> result(_n);
-        for (int i = 0; i < _n; i++) {
-            result[i].reserve(group_size[i]);
-        }
-        for (int i = 0; i < _n; i++) {
-            result[leader_buf[i]].push_back(i);
-        }
-        result.erase(
-            std::remove_if(result.begin(), result.end(),
-                           [&](const std::vector<int>& v) { return v.empty(); }),
-            result.end());
-        return result;
-    }
+}
 
-  private:
-    int _n;
-    std::vector<int> parent_or_size;
-};
-
-}  // namespace lastweapon
 
 using namespace lastweapon;
-const int N = int(1e2) + 9;
-int a[N], c[N]; LL fib[N];
-int n, ci;
+const int N = int(2e5) + 9;
+LL a[N], z;
+int n,m,k;
 
-bool ok(int x) {
-    RST(c);
-
-    REP(j, n) {
-        int s = a[j]; int ii = -1; VI t;
-        while (s) {
-            int i = 0; while (fib[i]<=s) i += 1;
-            while (i > ci) --i;
-            while (fib[i] > s) i -= 1;
-            while (c[i]) --i; //if (i + 1 == ii) --i;
-
-            //cout << j << " " << i << " " << ii << endl;
-
-
-            if (i <= 0) return 0;
-            s -= fib[i];
-            if (j == x && i == 2) return 0;
-            c[i]++; ii = i; t.PB(i);
+LL d(LL a, LL b) {
+    int ok = 0;
+    DWN(i, 40, 0) {
+        if (_1(b, i)) {
+            if (_1(a, i)) continue;
+            else break;
+        } else if (_1(a, i)) {
+            a ^= _1(i);
         }
-
-        SRT(t);
-        FOR(i, 1, SZ(t)) if (t[i-1] + 1 == t[i]) return 0;
-
     }
-     //FOR_1(i, 2, ci) cout << c[i] << " "; cout << endl;
-    FOR_1(i, 2, ci) if (c[i] != 1) return 0;
-    return 1;
+    return b - a;
 }
 
-bool ok() {
-    RD(n); LL s = 0; REP(i, n) s += RD(a[i]); if (s == 1) return 1;
-    s += 1; int i = 0; while (fib[i]<s) i += 1;
-    if (fib[i] != s) return 0;
-    ci = i - 2;
-
-
-    REP(i, n) {
-        a[i] -= 1;
-        if (ok(i)) return 1;
-        a[i] += 1;
-    }
-    return 0;
-
-
-    // FOR_1(i, 1, ci) if (c[i] != 1) return 0;
-
-    return 1;
+bool ok(int i) {
+    vector<LL> b;
+    REP(i, n) b.PB(d(a[i], z));
+    SRT(b); LL cc = 0; REP(i, k) cc += b[i];
+    return cc <= m;
 }
 
-int main(){
+
+int main() {
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
 #endif
+    RD(n,m,k); REP(i, n) RD(a[i]);
 
-    fib[0] = 0; fib[1] = 1;
-    FOR(i, 2, 100) fib[i] = fib[i-1] + fib[i-2];
-
-    Rush {
-        puts(ok() ? "YES" : "NO");
+    z = 0; DWN(i, 40, 0) {
+        z |= _1(i); if (!ok(i)) z ^= _1(i);
     }
+    cout << z << endl;
 }
-
-// 1 1 2 3 5 8
-//
-
