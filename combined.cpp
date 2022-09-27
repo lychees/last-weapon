@@ -1,4 +1,3 @@
-
 /*
     Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
     Repo: https://github.com/lychees/last-weapon
@@ -270,92 +269,166 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 namespace lastweapon {}
-
 namespace lastweapon {
 
-inline bool _1(int x, int i){return bool(x&1<<i);}
-inline bool _1(LL x, int i){return bool(x&1LL<<i);}
-inline LL _1(int i){return 1LL<<i;}
-inline LL _U(int i){return _1(i) - 1;};
+namespace NT{
+inline LL gcd(LL a, LL b){return b?gcd(b,a%b):a;}
+inline LL lcm(LL a, LL b){return a*b/gcd(a,b);}
 
-inline int reverse_bits(int x){
-    x = ((x >> 1) & 0x55555555) | ((x << 1) & 0xaaaaaaaa);
-    x = ((x >> 2) & 0x33333333) | ((x << 2) & 0xcccccccc);
-    x = ((x >> 4) & 0x0f0f0f0f) | ((x << 4) & 0xf0f0f0f0);
-    x = ((x >> 8) & 0x00ff00ff) | ((x << 8) & 0xff00ff00);
-    x = ((x >>16) & 0x0000ffff) | ((x <<16) & 0xffff0000);
-    return x;
+inline void INC(int &a, int b){a += b; if (a >= MOD) a -= MOD;}
+inline int sum(int a, int b){a += b; if (a >= MOD) a -= MOD; return a;}
+
+inline void DEC(int &a, int b){a -= b; if (a < 0) a += MOD;}
+inline int dff(int a, int b){a -= b; if (a < 0) a  += MOD; return a;}
+inline void MUL(int &a, int b){a = (LL)a * b % MOD;}
+inline int pdt(int x,int y) {
+    int ret; __asm__ __volatile__ ("\tmull %%ebx\n\tdivl %%ecx\n":"=d"(ret):"a"(x),"b"(y),"c"(MOD));
+    return ret;
 }
 
-inline LL reverse_bits(LL x){
-    x = ((x >> 1) & 0x5555555555555555LL) | ((x << 1) & 0xaaaaaaaaaaaaaaaaLL);
-    x = ((x >> 2) & 0x3333333333333333LL) | ((x << 2) & 0xccccccccccccccccLL);
-    x = ((x >> 4) & 0x0f0f0f0f0f0f0f0fLL) | ((x << 4) & 0xf0f0f0f0f0f0f0f0LL);
-    x = ((x >> 8) & 0x00ff00ff00ff00ffLL) | ((x << 8) & 0xff00ff00ff00ff00LL);
-    x = ((x >>16) & 0x0000ffff0000ffffLL) | ((x <<16) & 0xffff0000ffff0000LL);
-    x = ((x >>32) & 0x00000000ffffffffLL) | ((x <<32) & 0xffffffff00000000LL);
-    return x;
+
+inline int gcd(int m, int n, int &x, int &y){
+
+    x = 1, y = 0; int xx = 0, yy = 1, q;
+
+    while (1){
+        q = m / n, m %= n;
+        if (!m){x = xx, y = yy; return n;}
+        DEC(x, pdt(q, xx)), DEC(y, pdt(q, yy));
+        q = n / m, n %= m;
+        if (!n) return m;
+        DEC(xx, pdt(q, x)), DEC(yy, pdt(q, y));
+    }
 }
 
-template<class T> inline bool odd(T x){return x&1;}
-template<class T> inline bool even(T x){return !odd(x);}
-template<class T> inline T low_bit(T x) {return x & -x;}
-template<class T> inline T high_bit(T x) {T p = low_bit(x);while (p != x) x -= p, p = low_bit(x);return p;}
-template<class T> inline T cover_bit(T x){T p = 1; while (p < x) p <<= 1;return p;}
-template<class T> inline int cover_idx(T x){int p = 0; while (_1(p) < x ) ++p; return p;}
+inline int sum(int a, int b, int c){return sum(a, sum(b, c));}
+inline int sum(int a, int b, int c, int d){return sum(sum(a, b), sum(c, d));}
+inline int pdt(int a, int b, int c){return pdt(a, pdt(b, c));}
+inline int pdt(int a, int b, int c, int d){return pdt(pdt(a, b), pdt(c, d));}
 
-inline int clz(int x){return __builtin_clz(x);}
-inline int clz(LL x){return __builtin_clzll(x);}
-inline int ctz(int x){return __builtin_ctz(x);}
-inline int ctz(LL x){return __builtin_ctzll(x);}
-inline int lg2(int x){return !x ? -1 : 31 - clz(x);}
-inline int lg2(LL x){return !x ? -1 : 63 - clz(x);}
-inline int low_idx(int x){return !x ? -1 : ctz(x);}
-inline int low_idx(LL x){return !x ? -1 : ctz(x);}
-inline int high_idx(int x){return lg2(x);}
-inline int high_idx(LL x){return lg2(x);}
-inline int parity(int x){return __builtin_parity(x);}
-inline int parity(LL x){return __builtin_parityll(x);}
-inline int count_bits(int x){return __builtin_popcount(x);}
-inline int count_bits(LL x){return __builtin_popcountll(x);}
-
+inline int pow(int a, LL b){
+    int c(1); while (b){
+        if (b&1) MUL(c, a);
+        MUL(a, a), b >>= 1;
+    }
+    return c;
 }
 
+template<class T> inline T pow(T a, LL b){
+    T c(1); while (b){
+        if (b&1) c *= a;
+        a *= a, b >>= 1;
+    }
+    return c;
+}
+
+template<class T> inline T pow(T a, int b){
+    return pow(a, (LL)b);
+}
+
+inline int _I(int b){
+    int a = MOD, x1 = 0, x2 = 1, q; while (1){
+        q = a / b, a %= b;
+        if (!a) return x2;
+        DEC(x1, pdt(q, x2));
+
+        q = b / a, b %= a;
+        if (!b) return x1;
+        DEC(x2, pdt(q, x1));
+    }
+}
+
+inline void DIV(int &a, int b){MUL(a, _I(b));}
+inline int qtt(int a, int b){return pdt(a, _I(b));}
+
+struct Int{
+    int val;
+
+    operator int() const{return val;}
+
+    Int(int _val = 0):val(_val){
+        val %= MOD; if (val < 0) val += MOD;
+    }
+    Int(LL _val):val(_val){
+        _val %= MOD; if (_val < 0) _val += MOD;
+        val = _val;
+    }
+
+    Int& operator +=(const int& rhs){INC(val, rhs);rTs;}
+    Int operator +(const int& rhs) const{return sum(val, rhs);}
+    Int& operator -=(const int& rhs){DEC(val, rhs);rTs;}
+    Int operator -(const int& rhs) const{return dff(val, rhs);}
+    Int& operator *=(const int& rhs){MUL(val, rhs);rTs;}
+    Int operator *(const int& rhs) const{return pdt(val, rhs);}
+    Int& operator /=(const int& rhs){DIV(val, rhs);rTs;}
+    Int operator /(const int& rhs) const{return qtt(val, rhs);}
+    Int operator-()const{return MOD-*this;}
+};
+
+} using namespace NT;//}
+
+}  // namespace lastweapon
 
 using namespace lastweapon;
-const int N = int(2e5) + 9;
-LL a[N], z;
-int n,m,k;
 
-LL d(LL a, LL b) {
-    int ok = 0;
-    DWN(i, 40, 0) {
-        if (_1(b, i)) {
-            if (_1(a, i)) continue;
-            else break;
-        } else if (_1(a, i)) {
-            a ^= _1(i);
-        }
-    }
-    return b - a;
+const int N = int(1e6) + 9;
+
+typedef pair<pair<int, int>, int> rec;
+
+multiset<LL> z;
+
+map<int, multiset<LL> > c, d;
+
+vector<rec> e;
+int a[N],b[N],x[N],y[N];
+
+int n, k;
+
+void fix(multiset<LL>& x) {
+    while (x.size() > k) x.erase(x.begin());
 }
-
-bool ok(int i) {
-    vector<LL> b;
-    REP(i, n) b.PB(d(a[i], z));
-    SRT(b); LL cc = 0; REP(i, k) cc += b[i];
-    return cc <= m;
-}
-
 
 int main() {
 #ifndef ONLINE_JUDGE
-    freopen("in.txt", "r", stdin);
+    freopen("balance_sheet_input.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
 #endif
-    RD(n,m,k); REP(i, n) RD(a[i]);
 
-    z = 0; DWN(i, 40, 0) {
-        z |= _1(i); if (!ok(i)) z ^= _1(i);
+    Rush {
+        printf("Case #%d: ", ++Case);
+        z.clear(); RD(n, k);
+
+        c.clear(); d.clear(); e.clear();
+        REP_1(i, n) {
+            RD(a[i],b[i],x[i],y[i]);
+            e.PB({{a[i], x[i]}, -i});
+            e.PB({{b[i], y[i]}, i});
+        }
+        SRT(e);
+
+        for (auto& t: e) {
+            if (t.se < 0) { // buy
+                int id = -t.se;
+                c[id].insert(0);
+                for (auto i: d[a[id]]) {
+                    c[id].insert(i + x[id]);
+                    fix(c[id]);
+                }
+                for (auto i: c[id]) {
+                    z.insert(i); fix(z);
+                }
+
+            } else { // sell
+                int id = t.se;
+                for (auto i : c[id]) {
+                    d[b[id]].insert(i - y[id]);
+                    fix(d[b[id]]);
+                }
+            }
+        }
+
+        Int zz = 0; for (auto& t: z) zz += Int(t);
+        cout << zz <<endl;
     }
-    cout << z << endl;
+
 }
