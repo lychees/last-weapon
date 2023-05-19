@@ -10,9 +10,13 @@ Last Weapon is my own algorithms library for competitive programming, it is a fo
 - [https://github.com/hos-lyric/libra](https://github.com/hos-lyric/libra)
 - [https://github.com/kth-competitive-programming/kactl](https://github.com/kth-competitive-programming/kactl)
 - [https://github.com/NyaanNyaan/library](https://github.com/NyaanNyaan/library)
+- [https://github.com/hitonanode/cplib-cpp](https://github.com/hitonanode/cplib-cpp)
 
 ### Textbook
 - [https://oi-wiki.org](https://oi-wiki.org)
 - [https://cp-algorithms.com/index.html](https://cp-algorithms.com/index.html)
 - [https://usaco.guide/adv/](https://usaco.guide/adv/)
 - [https://web.ntnu.edu.tw/~algo](https://web.ntnu.edu.tw/~algo)
+
+### Tools
+- [https://github.com/online-judge-tools/verification-helper](https://github.com/online-judge-tools/verification-helper)
