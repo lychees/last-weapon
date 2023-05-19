@@ -37,8 +37,6 @@ namespace CG {
         Po&_1(){rTs/=len();}Po&conj(){y=-y;rTs;}Po&lt(){swap(x,y),x=-x;rTs;}Po&rt(){swap(x,y),y=-y;rTs;}
         Po&rot(DB a,cPo o=Po()){Ts-=o;Ts*=Po(cos(a),sin(a));rTs+=o;}
 
-
-        // ���������ޣ��󲿷������ֻ���������㹻��
         inline int q()const{
             return (y > 0 || y == 0 && x >= 0) ? 0 : 1;
             /*if (x > 0 && y >= 0) return 0;
@@ -111,7 +109,7 @@ namespace CG {
         }
         void getEquation(DB&A,DB&B,DB&C)const{A=a.y-b.y,B=b.x-a.x,C=det(a, b);}
 
-        Line&push(DB r){ // ����������������
+        Line&push(DB r){
             Po v=d()._1().lt()*r;a+=v,b+=v; rTs;
         }
     };
@@ -146,12 +144,10 @@ namespace CG {
         inline int sgn(cSeg l)const;
     };
 
-    // -1���ཻ 0�ཻ�����淶�� 1�ཻ���淶��
-
     //inline int Seg::sgn(cPo p)const{return -dott(p,a,b);}
 
     inline int Seg::sgn(cPo p)const{
-        if (dett(p, a, b)) return -1; // ��ʱ���о�������
+        if (dett(p, a, b)) return -1;
         if (a == p || b == p) return 0;
         return -dott(p,a,b);
     }
@@ -209,7 +205,7 @@ namespace CG {
 
     const int Disjoint = -2, Exscribe = -1, Cross = 0, Inscribe = 1, Contain = 2;
 
-    Po getX3(cPo a, cPo b, cPo c){ // ���ԲԲ��
+    Po getX3(cPo a, cPo b, cPo c){
         Po v0=b-a,v1=c-a;DB l0=v0.len2(),l1=v1.len2(),d=2*det(a,b,c);
         return Po(l0*v1.y-l1*v0.y,l1*v0.x-l0*v1.x)/d+a;
         //Po v0 = b-a, v1 = c-a, m0 = (a+b)/2, m1 = (a+c)/2;
@@ -217,13 +213,9 @@ namespace CG {
     }
 
 
-
-
-    Po getX4(cPo a, cPo b, cPo c){ // ���� // orthocenter
+    Po getX4(cPo a, cPo b, cPo c){
         return Line(a,a&Line(b,c))*Line(b,b&Line(a,c));
     }
-
-
 
     struct Circle{
         Po o; DB r; Circle(cPo o=Po(),DB r=0):o(o),r(r){}
@@ -235,11 +227,8 @@ namespace CG {
         void out(){printf("%.2f %.2f %.2f\n", o.x, o.y, r);}
 
         bool operator <(cCircle c)const{return r<c.r;}
-        //-1���� 0Բ�� 1����
         inline int sgn(cPo p)const{return ::sgn(r*r, dist2(o, p));}
-        //-1���� 0���� 1�ཻ
         inline int sgn(cLine l)const{return ::sgn(r*r, dist2(l, o));}
-        // -2���� -1���� 0�ཻ 1���� 2����
         inline int sgn(cCircle c)const{
             DB d=dist2(o,c.o);
             if (::sgn(sqr(r+c.r),d)<0) return Disjoint;
@@ -313,8 +302,7 @@ namespace CG {
     DB getPeri(const VP& P){DB z=0;FOR(i,1,SZ(P))z+=dist(P[i-1],P[i]);return z;}
 
 
-    // ͹��
-    VP getCH(VP& P, int b=1){ //��ʱ�룬����������
+    VP getCH(VP& P, int b=1){
 
         int n=SZ(P); if(n<=3) return P.PB(P[0]),getArea(P)<0?RVS(P):P;
 
@@ -331,9 +319,6 @@ namespace CG {
         C.resize(nn+1);
         return C;
     }
-
-
-    // ��ƽ�潻
 
     const int HPI_N = 109;
 
@@ -363,9 +348,6 @@ namespace CG {
         return P;
     }
 
-
-    // ���� - ���ƽ����
-
     bool cmpy(cPo a, cPo b){return a.y < b.y;}
 
     inline DB cp(VP &P, int l, int r){
@@ -383,9 +365,6 @@ namespace CG {
         UNQ(P);
         return cp(P, 0, SZ(P)-1);
     }
-
-
-    // ��С����Բ
 
     Circle getMinimalCoverCircle(VP& P){ //#
         random_shuffle(ALL(P)); int n = SZ(P);

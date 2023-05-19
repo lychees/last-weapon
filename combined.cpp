@@ -1,3 +1,4 @@
+
 /*
     Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
     Repo: https://github.com/lychees/last-weapon
@@ -269,166 +270,455 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 namespace lastweapon {}
+
 namespace lastweapon {
 
-namespace NT{
-inline LL gcd(LL a, LL b){return b?gcd(b,a%b):a;}
-inline LL lcm(LL a, LL b){return a*b/gcd(a,b);}
+const int __base = 1e8;
+const int P10[] = {1, 10, int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7), int(1e8), int(1e9)};
+const int MAX_BUF_SIZE = 109;
+char __buf[MAX_BUF_SIZE];
 
-inline void INC(int &a, int b){a += b; if (a >= MOD) a -= MOD;}
-inline int sum(int a, int b){a += b; if (a >= MOD) a -= MOD; return a;}
+class bignum{
+          friend istream& operator>>(istream&, bignum&);
+          friend ostream& operator<<(ostream&, const bignum&);
+          friend bignum operator +(const bignum&, const bignum&);
+          friend bignum operator -(const bignum&, const bignum&);
+          friend bignum operator *(const bignum&, const bignum&);
+          friend bignum operator /(const bignum&, const bignum&);
+          friend bignum operator %(const bignum&, const bignum&);
+          friend bignum operator +(const bignum&, const int&);
+          friend bignum operator -(const bignum&, const int&);
+          friend bignum operator *(const bignum&, const int&);
+          friend bignum operator /(const bignum&, const int&);
+          friend bignum operator %(const bignum&, const int&);
+          friend bool operator ==(const bignum&, const bignum&);
+          friend bool operator !=(const bignum&, const bignum&);
+          friend bool operator <(const bignum&, const bignum&);
+          friend bool operator >(const bignum&, const bignum&);
+          friend bool operator <=(const bignum&, const bignum&);
+          friend bool operator >=(const bignum&, const bignum&);
+          friend bool operator ==(const bignum&, const int&);
+          friend bool operator !=(const bignum&, const int&);
+          friend bool operator <(const bignum&, const int&);
+          friend bool operator >(const bignum&, const int&);
+          friend bool operator <=(const bignum&, const int&);
+          friend bool operator >=(const bignum&, const int&);
+          friend int do_comp(const bignum&, const int&);
+          friend int do_comp(const bignum&, const bignum&);
+          friend void divide(const bignum&, const bignum&, bignum&, bignum&);
+          friend bignum pow(bignum, int);
+          friend bignum pow(int, int);
+    public:
+        inline bignum(){};
+        inline bignum(int s){
+            while (s) data.push_back(s%__base), s/=__base;
+            if (data.empty()) data.push_back(0);
+        }
 
-inline void DEC(int &a, int b){a -= b; if (a < 0) a += MOD;}
-inline int dff(int a, int b){a -= b; if (a < 0) a  += MOD; return a;}
-inline void MUL(int &a, int b){a = (LL)a * b % MOD;}
-inline int pdt(int x,int y) {
-    int ret; __asm__ __volatile__ ("\tmull %%ebx\n\tdivl %%ecx\n":"=d"(ret):"a"(x),"b"(y),"c"(MOD));
-    return ret;
-}
+        inline bignum(long long s){
+            while (s) data.push_back(int(s%__base)), s/=__base;
+            if (data.empty()) data.push_back(0);
+        }
 
+        inline bignum(string s){
+            int t, i; data.clear();
+            for (i=int(s.size())-8;i>0;i-=8){
+                istringstream(s.substr(i, 8)) >> t;
+                data.push_back(t);
+            }
+            istringstream(s.substr(0, i+8)) >> t;
+            data.push_back(t);
+        }
 
-inline int gcd(int m, int n, int &x, int &y){
+        void input(){
+            data.clear(); scanf("%s", __buf); int t = 0, c = 0;
+            for(int i=strlen(__buf)-1;i>=0;--i){
+                t += P10[c] * (int(__buf[i]) - '0'), ++c;
+                if (c == 8) data.push_back(t), c = t = 0;
+            }
+            if (c) data.push_back(t);
+        }
 
-    x = 1, y = 0; int xx = 0, yy = 1, q;
+        bignum&operator=(int);
+        bignum&operator=(const string&);
+        bignum&operator=(const bignum&);
+        bignum&operator +=(const bignum&);
+        bignum&operator -=(const bignum&);
+        bignum&operator *=(const bignum&);
+        bignum&operator /=(const bignum&);
+        bignum&operator %=(const bignum&);
+        bignum&operator +=(const int&);
+        bignum&operator -=(const int&);
+        bignum&operator *=(const int&);
+        bignum&operator /=(const int&);
+        bignum&operator %=(const int&);
+        bool undefined();
+        int do_try(const int&);
+        int do_try(const bignum&);
+        void do_trim();
+        list<int> data;
 
-    while (1){
-        q = m / n, m %= n;
-        if (!m){x = xx, y = yy; return n;}
-        DEC(x, pdt(q, xx)), DEC(y, pdt(q, yy));
-        q = n / m, n %= m;
-        if (!n) return m;
-        DEC(xx, pdt(q, x)), DEC(yy, pdt(q, y));
+    int size(){
+        list<int>::iterator it; int res = 0;
+        for (it=data.begin(); it!=data.end();it++)
+            res += 8;
+        it--;
+        if (*it >= 10000) {
+            if ( (*it) >= 1000000) {if (*it >=10000000) ; else res--;}
+            else {if ((*it) >= 100000) res-=2; else res-=3;}
+        }
+        else
+            if ( (*it) >= 100) {if (*it >=1000) res-=4; else res-=5;}
+            else {if ((*it) >= 10) res-=6; else res-=7;}
+
+        return res;
     }
-}
 
-inline int sum(int a, int b, int c){return sum(a, sum(b, c));}
-inline int sum(int a, int b, int c, int d){return sum(sum(a, b), sum(c, d));}
-inline int pdt(int a, int b, int c){return pdt(a, pdt(b, c));}
-inline int pdt(int a, int b, int c, int d){return pdt(pdt(a, b), pdt(c, d));}
-
-inline int pow(int a, LL b){
-    int c(1); while (b){
-        if (b&1) MUL(c, a);
-        MUL(a, a), b >>= 1;
+    void do_reserve(int a){
+        if (a <= 0) return;
+        list<int>::iterator it;
+        for (it=data.begin(); it!=data.end() && a>0; it++) a-=8;
+        if (it == data.end() && a>=0) return;
+        a+=8, it--; int f = 1;
+        for (int i=0;i<a;i++) f *= 10; (*it) %= f;
+        data.erase(++it, data.end());
+        do_trim();
     }
-    return c;
-}
-
-template<class T> inline T pow(T a, LL b){
-    T c(1); while (b){
-        if (b&1) c *= a;
-        a *= a, b >>= 1;
-    }
-    return c;
-}
-
-template<class T> inline T pow(T a, int b){
-    return pow(a, (LL)b);
-}
-
-inline int _I(int b){
-    int a = MOD, x1 = 0, x2 = 1, q; while (1){
-        q = a / b, a %= b;
-        if (!a) return x2;
-        DEC(x1, pdt(q, x2));
-
-        q = b / a, b %= a;
-        if (!b) return x1;
-        DEC(x2, pdt(q, x1));
-    }
-}
-
-inline void DIV(int &a, int b){MUL(a, _I(b));}
-inline int qtt(int a, int b){return pdt(a, _I(b));}
-
-struct Int{
-    int val;
-
-    operator int() const{return val;}
-
-    Int(int _val = 0):val(_val){
-        val %= MOD; if (val < 0) val += MOD;
-    }
-    Int(LL _val):val(_val){
-        _val %= MOD; if (_val < 0) _val += MOD;
-        val = _val;
-    }
-
-    Int& operator +=(const int& rhs){INC(val, rhs);rTs;}
-    Int operator +(const int& rhs) const{return sum(val, rhs);}
-    Int& operator -=(const int& rhs){DEC(val, rhs);rTs;}
-    Int operator -(const int& rhs) const{return dff(val, rhs);}
-    Int& operator *=(const int& rhs){MUL(val, rhs);rTs;}
-    Int operator *(const int& rhs) const{return pdt(val, rhs);}
-    Int& operator /=(const int& rhs){DIV(val, rhs);rTs;}
-    Int operator /(const int& rhs) const{return qtt(val, rhs);}
-    Int operator-()const{return MOD-*this;}
 };
 
-} using namespace NT;//}
+inline bignum&bignum::operator =(const bignum&a){
+    data.clear();
+    for (list<int>::const_iterator i=a.data.begin();i!=a.data.end();i++){
+        data.push_back(*i);
+    }
+    return*this;
+}
+inline bignum&bignum::operator =(const string&a){
+    return*this=bignum(a);
+}
+inline bignum&bignum::operator =(int a){
+    return*this=bignum(a);
+}
+
+inline istream& operator>>(istream& input, bignum& a){
+    string s; int t, i; input >> s; a.data.clear();
+    for (i=int(s.size())-8;i>0;i-=8){
+        istringstream(s.substr(i, 8)) >> t;
+        a.data.push_back(t);
+    }
+    istringstream(s.substr(0, i+8)) >> t;
+    a.data.push_back(t);
+    return input;
+}
+
+inline ostream& operator<<(ostream& output, const bignum& a){
+    list<int>::const_reverse_iterator i=a.data.rbegin();
+    output << *i;
+    for (i++;i!=a.data.rend();i++){
+        if (*i >= 10000) {
+            if (*i >= 1000000) {if (*i>=10000000) cout << *i; else cout << 0 << *i;}
+            else {if (*i>=100000) cout << "00" << *i; else cout << "000" << *i;}
+        }
+        else {
+            if (*i >= 100) {if (*i>=1000)  cout << "0000" << *i; else cout << "00000" << *i;}
+            else { if (*i>=10) cout << "000000" << *i; else cout << "0000000" << *i;}
+        }
+    }
+    return output;
+}
+
+inline bool bignum::undefined(){
+    return data.empty();
+}
+
+inline int do_comp(const bignum& a, const bignum& b){
+    if (a.data.size()<b.data.size()) return -1; if (a.data.size()>b.data.size()) return 1;
+    list<int>::const_reverse_iterator i; list<int>::const_reverse_iterator j;
+    for (i=a.data.rbegin(),j=b.data.rbegin(); j!=b.data.rend(); i++,j++){
+        if (*i<*j) return -1;              //!!!!
+        if (*i>*j) return 1;
+    }
+    return 0;
+}
+inline int do_comp(const bignum& a, const int& b){
+    return do_comp(a, bignum(b));
+}
+
+inline bool operator ==(const bignum& a, const bignum& b){
+    return do_comp(a, b) == 0;
+}
+inline bool operator !=(const bignum& a, const bignum& b){
+    return do_comp(a, b) != 0;
+}
+inline bool operator <(const bignum& a, const bignum& b){
+    return do_comp(a, b) == -1;
+}
+inline bool operator >(const bignum& a, const bignum& b){
+    return do_comp(a, b) == 1;
+}
+inline bool operator <=(const bignum& a, const bignum& b){
+    return do_comp(a, b) != 1;
+}
+inline bool operator >=(const bignum& a, const bignum& b){
+    return do_comp(a, b) != -1;
+}
+
+inline bool operator ==(const bignum& a, const int& b){
+    return do_comp(a, b) == 0;
+}
+inline bool operator !=(const bignum& a, const int& b){
+    return do_comp(a, b) != 0;
+}
+inline bool operator <(const bignum& a, const int& b){
+    return do_comp(a, b) == -1;
+}
+inline bool operator >(const bignum& a, const int& b){
+    return do_comp(a, b) == 1;
+}
+inline bool operator <=(const bignum& a, const int& b){
+    return do_comp(a, b) != 1;
+}
+inline bool operator >=(const bignum& a, const int& b){
+    return do_comp(a, b) != -1;
+}
+
+inline void bignum::do_trim(){
+    while (data.size()>1&&data.back()==0) data.pop_back();
+}
+
+inline bignum& bignum::operator +=(const bignum& a){
+    list<int>::iterator i; list<int>::const_iterator j; int t = 0;
+    for (i=data.begin(),j=a.data.begin(); i!=data.end()&&j!=a.data.end(); i++,j++){
+        *i+=*j+t; t=*i/__base; *i%=__base;
+    }
+    while (i!=data.end()) {*i+=t; t=*i/__base; *i%=__base; i++;}
+    while (j!=a.data.end()) {data.push_back(t+*j); t=data.back()/__base; data.back()%=__base; j++;}
+    if (t!=0) data.push_back(t);
+    return *this;
+}
+
+inline bignum& bignum::operator -=(const bignum& a){
+    list<int>::iterator i; list<int>::const_iterator j; int t = 0;
+    for (i=data.begin(),j=a.data.begin(); j!=a.data.end(); i++,j++){
+        *i -= t+*j; if (*i>=0) t=0; else *i+=__base, t=1;
+    }
+    while (i!=data.end()) {*i-=t; if (*i>=0) t=0;else *i+=__base, t=1; i++;}
+    (*this).do_trim();
+    return *this;
+}
+
+inline bignum& bignum::operator +=(const int& a){
+    return (*this)+=bignum(a);
+}
+
+inline bignum& bignum::operator -=(const int& a){
+    return (*this)-=bignum(a);
+}
+
+inline bignum operator +(const bignum& a, const bignum& b){
+    list<int>::const_iterator i, j; bignum c; int t = 0;
+    for (i=a.data.begin(),j=b.data.begin(); i!=a.data.end()&&j!=b.data.end(); i++,j++){
+        c.data.push_back(t+*i+*j);
+        t=c.data.back()/__base; c.data.back()%=__base;
+    }
+    while (i!=a.data.end()) {c.data.push_back(t+*i); t=c.data.back()/__base; c.data.back()%=__base; i++;}
+    while (j!=b.data.end()) {c.data.push_back(t+*j); t=c.data.back()/__base; c.data.back()%=__base; j++;}
+    if (t!=0) c.data.push_back(t);
+    return c;
+}
+
+inline bignum operator -(const bignum& a, const bignum& b){
+    list<int>::const_iterator i, j; bignum c; int t = 0;
+    for (i=a.data.begin(),j=b.data.begin(); j!=b.data.end(); i++,j++){
+        t = *i - t;
+        if (t>=*j) c.data.push_back(t-*j), t=0;
+        else c.data.push_back(t+__base-*j), t=1;
+    }
+    while (i!=a.data.end()) {t=*i-t; if (t>=0) c.data.push_back(t), t=0;else c.data.push_back(t+__base), t=1; i++;}
+    c.do_trim();
+    return c;
+}
+
+inline bignum operator *(const bignum& a, const bignum& b){
+    list<int>::const_iterator i, j; list<int>::iterator k, kk; bignum c; long long t = 0;
+
+    for (int i=0;i<a.data.size()+b.data.size();i++) c.data.push_back(0);
+    for (i=a.data.begin(),k=c.data.begin(); i!=a.data.end(); i++,k++){
+        for (j=b.data.begin(),kk=k; j!=b.data.end(); j++,kk++){
+            t+=(long long)(*i)*(*j)+(*kk);
+            *kk=int(t%__base); t/=__base;
+        }
+        *kk+=t; t=0;
+    }
+    c.do_trim();
+    return c;
+}
+
+inline int bignum::do_try(const bignum& a){
+    int l = 1, r = 99999999, m, t;
+    while (l+2<r){
+        m = (l + r) / 2;
+        t = do_comp(*this, a*bignum(m));
+        if (t==0) return m;
+        if (t<0) r = m - 1;
+        else l = m;
+    }
+    while (do_comp(*this, a*bignum(r))<0) r--;
+    return r;
+}
+
+inline void divide(const bignum& a, const bignum& b, bignum& d, bignum& r){
+    list<int>::const_reverse_iterator i = a.data.rbegin(); int t;
+    d = bignum(0); r = bignum(0);
+    do {
+        while (r<b&&i!=a.data.rend()){d.data.push_front(0);r.data.push_front(*i);r.do_trim();i++;}
+        if (r>=b){
+            t = r.do_try(b); d.data.front() = t;
+            r-=(b*bignum(t));
+        }
+    } while (i!=a.data.rend());
+    d.do_trim();
+}
+
+inline bignum operator /(const bignum& a, const bignum& b){
+    bignum d, r;
+    divide(a, b, d, r);
+    return d;
+}
+
+inline bignum operator %(const bignum& a, const bignum& b){
+    bignum d, r;
+    divide(a, b, d, r);
+    return r;
+}
+
+inline bignum operator +(const bignum& a, const int& b){
+    return a+bignum(b);
+}
+
+inline bignum operator -(const bignum& a, const int& b){
+    return a-bignum(b);
+}
+
+inline bignum operator *(const bignum& a, const int& b){
+    return a*bignum(b);
+}
+
+inline bignum operator /(const bignum& a, const int& b){
+    return a/bignum(b);
+}
+
+inline bignum operator %(const bignum& a, const int& b){
+    return a%bignum(b);
+}
+
+inline bignum& bignum::operator *=(const bignum& a){
+    (*this) = (*this) * a;
+    return *this;
+}
+
+inline bignum& bignum::operator /=(const bignum& a){
+    (*this) = (*this) / a;
+    return *this;
+}
+
+inline bignum& bignum::operator %=(const bignum& a){
+    (*this) = (*this) % a;
+    return *this;
+}
+
+inline bignum& bignum::operator *=(const int& a){
+    return (*this)*=bignum(a);
+}
+
+inline bignum& bignum::operator /=(const int& a){
+    return (*this)/=bignum(a);
+}
+
+inline bignum& bignum::operator %=(const int& a){
+    return (*this)%=bignum(a);
+}
+
+inline bignum pow(bignum a,int b){
+    bignum c(1);
+    while (b!=0) {
+        if (b&1) c *= a;
+        a = a * a; b >>= 1;
+    }
+    return c;
+}
+inline bignum pow(int a, int b){
+    return pow(bignum(a), b);
+}
 
 }  // namespace lastweapon
 
+
 using namespace lastweapon;
 
-const int N = int(1e6) + 9;
+const int N = 20;
+int a[N][N], b[N][N]; bool v[N][N];
+int n, m; bignum z;
 
-typedef pair<pair<int, int>, int> rec;
+int f(){
+	int z = 0; RST(v);
+	REP(i, n) REP(j, m) if (!v[i][j]) {
+        int x = i, y = j;  do {
+            v[x][y] = true;  int t = a[x][y];
+            x = t / m, y = t % m;
+        } while (!v[x][y]);
+        ++z;
+    }
+	return z;
 
-multiset<LL> z;
+}
 
-map<int, multiset<LL> > c, d;
+void rt90(){
+	CPY(b, a); REP(i, n) REP(j, m) a[j][n-i-1] = b[i][j];
+	swap(n, m);
+}
 
-vector<rec> e;
-int a[N],b[N],x[N],y[N];
+void rt180(){
+	rt90(); rt90();
+}
 
-int n, k;
+void rolln(){
+	CPY(b, a); REP(i, n) REP(j, m) a[i][j] = b[(i+1)%n][j];
+}
 
-void fix(multiset<LL>& x) {
-    while (x.size() > k) x.erase(x.begin());
+void rollm(){
+	CPY(b, a); REP(i, n) REP(j, m) a[i][j] = b[i][(j+1)%m];
+}
+
+void init(){
+	REP(i, n) REP(j, m) a[i][j] = i*m + j; z = 0;
+}
+
+void Polay(){
+	if (n==m){
+		for (int k=0;k<4;k++,rt90())
+			for (int i=0;i<n;i++,rolln())
+				for (int j=0;j<m;j++,rollm())
+					z += pow(bignum(2), f());
+		z /= 4*n*m;
+	}
+	else {
+		for (int k=0;k<2;k++,rt180())
+			for (int i=0;i<n;i++,rolln())
+				for (int j=0;j<m;j++,rollm())
+					z += pow(bignum(2), f());
+		z /= 2*n*m;
+	}
 }
 
 int main() {
+
 #ifndef ONLINE_JUDGE
-    freopen("balance_sheet_input.txt", "r", stdin);
-    freopen("out.txt", "w", stdout);
+    //freopen("in.txt", "r", stdin);
 #endif
 
-    Rush {
-        printf("Case #%d: ", ++Case);
-        z.clear(); RD(n, k);
-
-        c.clear(); d.clear(); e.clear();
-        REP_1(i, n) {
-            RD(a[i],b[i],x[i],y[i]);
-            e.PB({{a[i], x[i]}, -i});
-            e.PB({{b[i], y[i]}, i});
-        }
-        SRT(e);
-
-        for (auto& t: e) {
-            if (t.se < 0) { // buy
-                int id = -t.se;
-                c[id].insert(0);
-                for (auto i: d[a[id]]) {
-                    c[id].insert(i + x[id]);
-                    fix(c[id]);
-                }
-                for (auto i: c[id]) {
-                    z.insert(i); fix(z);
-                }
-
-            } else { // sell
-                int id = t.se;
-                for (auto i : c[id]) {
-                    d[b[id]].insert(i - y[id]);
-                    fix(d[b[id]]);
-                }
-            }
-        }
-
-        Int zz = 0; for (auto& t: z) zz += Int(t);
-        cout << zz <<endl;
-    }
-
+    while (scanf("%d %d", &n, &m) != EOF){
+		init(); Polay();
+		cout << z << endl;
+	}
 }

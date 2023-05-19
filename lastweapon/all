@@ -19,3 +19,4 @@
 #include "lastweapon/sam"
 #include "lastweapon/splay"
 #include "lastweapon/geometry"
+#include "lastweapon/poly"
