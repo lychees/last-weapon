@@ -271,454 +271,856 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
 }
 namespace lastweapon {}
 
-namespace lastweapon {
 
-const int __base = 1e8;
-const int P10[] = {1, 10, int(1e2), int(1e3), int(1e4), int(1e5), int(1e6), int(1e7), int(1e8), int(1e9)};
-const int MAX_BUF_SIZE = 109;
-char __buf[MAX_BUF_SIZE];
-
-class bignum{
-          friend istream& operator>>(istream&, bignum&);
-          friend ostream& operator<<(ostream&, const bignum&);
-          friend bignum operator +(const bignum&, const bignum&);
-          friend bignum operator -(const bignum&, const bignum&);
-          friend bignum operator *(const bignum&, const bignum&);
-          friend bignum operator /(const bignum&, const bignum&);
-          friend bignum operator %(const bignum&, const bignum&);
-          friend bignum operator +(const bignum&, const int&);
-          friend bignum operator -(const bignum&, const int&);
-          friend bignum operator *(const bignum&, const int&);
-          friend bignum operator /(const bignum&, const int&);
-          friend bignum operator %(const bignum&, const int&);
-          friend bool operator ==(const bignum&, const bignum&);
-          friend bool operator !=(const bignum&, const bignum&);
-          friend bool operator <(const bignum&, const bignum&);
-          friend bool operator >(const bignum&, const bignum&);
-          friend bool operator <=(const bignum&, const bignum&);
-          friend bool operator >=(const bignum&, const bignum&);
-          friend bool operator ==(const bignum&, const int&);
-          friend bool operator !=(const bignum&, const int&);
-          friend bool operator <(const bignum&, const int&);
-          friend bool operator >(const bignum&, const int&);
-          friend bool operator <=(const bignum&, const int&);
-          friend bool operator >=(const bignum&, const int&);
-          friend int do_comp(const bignum&, const int&);
-          friend int do_comp(const bignum&, const bignum&);
-          friend void divide(const bignum&, const bignum&, bignum&, bignum&);
-          friend bignum pow(bignum, int);
-          friend bignum pow(int, int);
-    public:
-        inline bignum(){};
-        inline bignum(int s){
-            while (s) data.push_back(s%__base), s/=__base;
-            if (data.empty()) data.push_back(0);
-        }
-
-        inline bignum(long long s){
-            while (s) data.push_back(int(s%__base)), s/=__base;
-            if (data.empty()) data.push_back(0);
-        }
-
-        inline bignum(string s){
-            int t, i; data.clear();
-            for (i=int(s.size())-8;i>0;i-=8){
-                istringstream(s.substr(i, 8)) >> t;
-                data.push_back(t);
-            }
-            istringstream(s.substr(0, i+8)) >> t;
-            data.push_back(t);
-        }
-
-        void input(){
-            data.clear(); scanf("%s", __buf); int t = 0, c = 0;
-            for(int i=strlen(__buf)-1;i>=0;--i){
-                t += P10[c] * (int(__buf[i]) - '0'), ++c;
-                if (c == 8) data.push_back(t), c = t = 0;
-            }
-            if (c) data.push_back(t);
-        }
-
-        bignum&operator=(int);
-        bignum&operator=(const string&);
-        bignum&operator=(const bignum&);
-        bignum&operator +=(const bignum&);
-        bignum&operator -=(const bignum&);
-        bignum&operator *=(const bignum&);
-        bignum&operator /=(const bignum&);
-        bignum&operator %=(const bignum&);
-        bignum&operator +=(const int&);
-        bignum&operator -=(const int&);
-        bignum&operator *=(const int&);
-        bignum&operator /=(const int&);
-        bignum&operator %=(const int&);
-        bool undefined();
-        int do_try(const int&);
-        int do_try(const bignum&);
-        void do_trim();
-        list<int> data;
-
-    int size(){
-        list<int>::iterator it; int res = 0;
-        for (it=data.begin(); it!=data.end();it++)
-            res += 8;
-        it--;
-        if (*it >= 10000) {
-            if ( (*it) >= 1000000) {if (*it >=10000000) ; else res--;}
-            else {if ((*it) >= 100000) res-=2; else res-=3;}
-        }
-        else
-            if ( (*it) >= 100) {if (*it >=1000) res-=4; else res-=5;}
-            else {if ((*it) >= 10) res-=6; else res-=7;}
-
-        return res;
-    }
-
-    void do_reserve(int a){
-        if (a <= 0) return;
-        list<int>::iterator it;
-        for (it=data.begin(); it!=data.end() && a>0; it++) a-=8;
-        if (it == data.end() && a>=0) return;
-        a+=8, it--; int f = 1;
-        for (int i=0;i<a;i++) f *= 10; (*it) %= f;
-        data.erase(++it, data.end());
-        do_trim();
-    }
+template <unsigned M_> struct ModInt {
+  static constexpr unsigned M = M_;
+  unsigned x;
+  constexpr ModInt() : x(0U) {}
+  constexpr ModInt(unsigned x_) : x(x_ % M) {}
+  constexpr ModInt(unsigned long long x_) : x(x_ % M) {}
+  constexpr ModInt(int x_) : x(((x_ %= static_cast<int>(M)) < 0) ? (x_ + static_cast<int>(M)) : x_) {}
+  constexpr ModInt(long long x_) : x(((x_ %= static_cast<long long>(M)) < 0) ? (x_ + static_cast<long long>(M)) : x_) {}
+  ModInt &operator+=(const ModInt &a) { x = ((x += a.x) >= M) ? (x - M) : x; return *this; }
+  ModInt &operator-=(const ModInt &a) { x = ((x -= a.x) >= M) ? (x + M) : x; return *this; }
+  ModInt &operator*=(const ModInt &a) { x = (static_cast<unsigned long long>(x) * a.x) % M; return *this; }
+  ModInt &operator/=(const ModInt &a) { return (*this *= a.inv()); }
+  ModInt pow(long long e) const {
+    if (e < 0) return inv().pow(-e);
+    ModInt a = *this, b = 1U; for (; e; e >>= 1) { if (e & 1) b *= a; a *= a; } return b;
+  }
+  ModInt inv() const {
+    unsigned a = M, b = x; int y = 0, z = 1;
+    for (; b; ) { const unsigned q = a / b; const unsigned c = a - q * b; a = b; b = c; const int w = y - static_cast<int>(q) * z; y = z; z = w; }
+    assert(a == 1U); return ModInt(y);
+  }
+  ModInt operator+() const { return *this; }
+  ModInt operator-() const { ModInt a; a.x = x ? (M - x) : 0U; return a; }
+  ModInt operator+(const ModInt &a) const { return (ModInt(*this) += a); }
+  ModInt operator-(const ModInt &a) const { return (ModInt(*this) -= a); }
+  ModInt operator*(const ModInt &a) const { return (ModInt(*this) *= a); }
+  ModInt operator/(const ModInt &a) const { return (ModInt(*this) /= a); }
+  template <class T> friend ModInt operator+(T a, const ModInt &b) { return (ModInt(a) += b); }
+  template <class T> friend ModInt operator-(T a, const ModInt &b) { return (ModInt(a) -= b); }
+  template <class T> friend ModInt operator*(T a, const ModInt &b) { return (ModInt(a) *= b); }
+  template <class T> friend ModInt operator/(T a, const ModInt &b) { return (ModInt(a) /= b); }
+  explicit operator bool() const { return x; }
+  bool operator==(const ModInt &a) const { return (x == a.x); }
+  bool operator!=(const ModInt &a) const { return (x != a.x); }
+  friend std::ostream &operator<<(std::ostream &os, const ModInt &a) { return os << a.x; }
 };
 
-inline bignum&bignum::operator =(const bignum&a){
-    data.clear();
-    for (list<int>::const_iterator i=a.data.begin();i!=a.data.end();i++){
-        data.push_back(*i);
-    }
-    return*this;
-}
-inline bignum&bignum::operator =(const string&a){
-    return*this=bignum(a);
-}
-inline bignum&bignum::operator =(int a){
-    return*this=bignum(a);
-}
+constexpr unsigned MO = 998244353U;
+constexpr unsigned MO2 = 2U * MO;
+constexpr int FFT_MAX = 23;
+using Mint = ModInt<MO>;
+constexpr Mint FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 911660635U, 372528824U, 929031873U, 452798380U, 922799308U, 781712469U, 476477967U, 166035806U, 258648936U, 584193783U, 63912897U, 350007156U, 666702199U, 968855178U, 629671588U, 24514907U, 996173970U, 363395222U, 565042129U, 733596141U, 267099868U, 15311432U};
+constexpr Mint INV_FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 86583718U, 509520358U, 337190230U, 87557064U, 609441965U, 135236158U, 304459705U, 685443576U, 381598368U, 335559352U, 129292727U, 358024708U, 814576206U, 708402881U, 283043518U, 3707709U, 121392023U, 704923114U, 950391366U, 428961804U, 382752275U, 469870224U};
+constexpr Mint FFT_RATIOS[FFT_MAX] = {911660635U, 509520358U, 369330050U, 332049552U, 983190778U, 123842337U, 238493703U, 975955924U, 603855026U, 856644456U, 131300601U, 842657263U, 730768835U, 942482514U, 806263778U, 151565301U, 510815449U, 503497456U, 743006876U, 741047443U, 56250497U, 867605899U};
+constexpr Mint INV_FFT_RATIOS[FFT_MAX] = {86583718U, 372528824U, 373294451U, 645684063U, 112220581U, 692852209U, 155456985U, 797128860U, 90816748U, 860285882U, 927414960U, 354738543U, 109331171U, 293255632U, 535113200U, 308540755U, 121186627U, 608385704U, 438932459U, 359477183U, 824071951U, 103369235U};
 
-inline istream& operator>>(istream& input, bignum& a){
-    string s; int t, i; input >> s; a.data.clear();
-    for (i=int(s.size())-8;i>0;i-=8){
-        istringstream(s.substr(i, 8)) >> t;
-        a.data.push_back(t);
+void fft(Mint *as, int n) {
+  assert(!(n & (n - 1))); assert(1 <= n); assert(n <= 1 << FFT_MAX);
+  int m = n;
+  if (m >>= 1) {
+    for (int i = 0; i < m; ++i) {
+      const unsigned x = as[i + m].x;  // < MO
+      as[i + m].x = as[i].x + MO - x;  // < 2 MO
+      as[i].x += x;  // < 2 MO
     }
-    istringstream(s.substr(0, i+8)) >> t;
-    a.data.push_back(t);
-    return input;
-}
-
-inline ostream& operator<<(ostream& output, const bignum& a){
-    list<int>::const_reverse_iterator i=a.data.rbegin();
-    output << *i;
-    for (i++;i!=a.data.rend();i++){
-        if (*i >= 10000) {
-            if (*i >= 1000000) {if (*i>=10000000) cout << *i; else cout << 0 << *i;}
-            else {if (*i>=100000) cout << "00" << *i; else cout << "000" << *i;}
+  }
+  if (m >>= 1) {
+    Mint prod = 1U;
+    for (int h = 0, i0 = 0; i0 < n; i0 += (m << 1)) {
+      for (int i = i0; i < i0 + m; ++i) {
+        const unsigned x = (prod * as[i + m]).x;  // < MO
+        as[i + m].x = as[i].x + MO - x;  // < 3 MO
+        as[i].x += x;  // < 3 MO
+      }
+      prod *= FFT_RATIOS[__builtin_ctz(++h)];
+    }
+  }
+  for (; m; ) {
+    if (m >>= 1) {
+      Mint prod = 1U;
+      for (int h = 0, i0 = 0; i0 < n; i0 += (m << 1)) {
+        for (int i = i0; i < i0 + m; ++i) {
+          const unsigned x = (prod * as[i + m]).x;  // < MO
+          as[i + m].x = as[i].x + MO - x;  // < 4 MO
+          as[i].x += x;  // < 4 MO
         }
-        else {
-            if (*i >= 100) {if (*i>=1000)  cout << "0000" << *i; else cout << "00000" << *i;}
-            else { if (*i>=10) cout << "000000" << *i; else cout << "0000000" << *i;}
+        prod *= FFT_RATIOS[__builtin_ctz(++h)];
+      }
+    }
+    if (m >>= 1) {
+      Mint prod = 1U;
+      for (int h = 0, i0 = 0; i0 < n; i0 += (m << 1)) {
+        for (int i = i0; i < i0 + m; ++i) {
+          const unsigned x = (prod * as[i + m]).x;  // < MO
+          as[i].x = (as[i].x >= MO2) ? (as[i].x - MO2) : as[i].x;  // < 2 MO
+          as[i + m].x = as[i].x + MO - x;  // < 3 MO
+          as[i].x += x;  // < 3 MO
         }
+        prod *= FFT_RATIOS[__builtin_ctz(++h)];
+      }
     }
-    return output;
+  }
+  for (int i = 0; i < n; ++i) {
+    as[i].x = (as[i].x >= MO2) ? (as[i].x - MO2) : as[i].x;  // < 2 MO
+    as[i].x = (as[i].x >= MO) ? (as[i].x - MO) : as[i].x;  // < MO
+  }
 }
 
-inline bool bignum::undefined(){
-    return data.empty();
-}
-
-inline int do_comp(const bignum& a, const bignum& b){
-    if (a.data.size()<b.data.size()) return -1; if (a.data.size()>b.data.size()) return 1;
-    list<int>::const_reverse_iterator i; list<int>::const_reverse_iterator j;
-    for (i=a.data.rbegin(),j=b.data.rbegin(); j!=b.data.rend(); i++,j++){
-        if (*i<*j) return -1;              //!!!!
-        if (*i>*j) return 1;
+void invFft(Mint *as, int n) {
+  assert(!(n & (n - 1))); assert(1 <= n); assert(n <= 1 << FFT_MAX);
+  int m = 1;
+  if (m < n >> 1) {
+    Mint prod = 1U;
+    for (int h = 0, i0 = 0; i0 < n; i0 += (m << 1)) {
+      for (int i = i0; i < i0 + m; ++i) {
+        const unsigned long long y = as[i].x + MO - as[i + m].x;  // < 2 MO
+        as[i].x += as[i + m].x;  // < 2 MO
+        as[i + m].x = (prod.x * y) % MO;  // < MO
+      }
+      prod *= INV_FFT_RATIOS[__builtin_ctz(++h)];
     }
-    return 0;
-}
-inline int do_comp(const bignum& a, const int& b){
-    return do_comp(a, bignum(b));
-}
-
-inline bool operator ==(const bignum& a, const bignum& b){
-    return do_comp(a, b) == 0;
-}
-inline bool operator !=(const bignum& a, const bignum& b){
-    return do_comp(a, b) != 0;
-}
-inline bool operator <(const bignum& a, const bignum& b){
-    return do_comp(a, b) == -1;
-}
-inline bool operator >(const bignum& a, const bignum& b){
-    return do_comp(a, b) == 1;
-}
-inline bool operator <=(const bignum& a, const bignum& b){
-    return do_comp(a, b) != 1;
-}
-inline bool operator >=(const bignum& a, const bignum& b){
-    return do_comp(a, b) != -1;
-}
-
-inline bool operator ==(const bignum& a, const int& b){
-    return do_comp(a, b) == 0;
-}
-inline bool operator !=(const bignum& a, const int& b){
-    return do_comp(a, b) != 0;
-}
-inline bool operator <(const bignum& a, const int& b){
-    return do_comp(a, b) == -1;
-}
-inline bool operator >(const bignum& a, const int& b){
-    return do_comp(a, b) == 1;
-}
-inline bool operator <=(const bignum& a, const int& b){
-    return do_comp(a, b) != 1;
-}
-inline bool operator >=(const bignum& a, const int& b){
-    return do_comp(a, b) != -1;
-}
-
-inline void bignum::do_trim(){
-    while (data.size()>1&&data.back()==0) data.pop_back();
-}
-
-inline bignum& bignum::operator +=(const bignum& a){
-    list<int>::iterator i; list<int>::const_iterator j; int t = 0;
-    for (i=data.begin(),j=a.data.begin(); i!=data.end()&&j!=a.data.end(); i++,j++){
-        *i+=*j+t; t=*i/__base; *i%=__base;
+    m <<= 1;
+  }
+  for (; m < n >> 1; m <<= 1) {
+    Mint prod = 1U;
+    for (int h = 0, i0 = 0; i0 < n; i0 += (m << 1)) {
+      for (int i = i0; i < i0 + (m >> 1); ++i) {
+        const unsigned long long y = as[i].x + MO2 - as[i + m].x;  // < 4 MO
+        as[i].x += as[i + m].x;  // < 4 MO
+        as[i].x = (as[i].x >= MO2) ? (as[i].x - MO2) : as[i].x;  // < 2 MO
+        as[i + m].x = (prod.x * y) % MO;  // < MO
+      }
+      for (int i = i0 + (m >> 1); i < i0 + m; ++i) {
+        const unsigned long long y = as[i].x + MO - as[i + m].x;  // < 2 MO
+        as[i].x += as[i + m].x;  // < 2 MO
+        as[i + m].x = (prod.x * y) % MO;  // < MO
+      }
+      prod *= INV_FFT_RATIOS[__builtin_ctz(++h)];
     }
-    while (i!=data.end()) {*i+=t; t=*i/__base; *i%=__base; i++;}
-    while (j!=a.data.end()) {data.push_back(t+*j); t=data.back()/__base; data.back()%=__base; j++;}
-    if (t!=0) data.push_back(t);
+  }
+  if (m < n) {
+    for (int i = 0; i < m; ++i) {
+      const unsigned y = as[i].x + MO2 - as[i + m].x;  // < 4 MO
+      as[i].x += as[i + m].x;  // < 4 MO
+      as[i + m].x = y;  // < 4 MO
+    }
+  }
+  const Mint invN = Mint(n).inv();
+  for (int i = 0; i < n; ++i) {
+    as[i] *= invN;
+  }
+}
+
+void fft(vector<Mint> &as) {
+  fft(as.data(), as.size());
+}
+void invFft(vector<Mint> &as) {
+  invFft(as.data(), as.size());
+}
+
+vector<Mint> convolve(vector<Mint> as, vector<Mint> bs) {
+  if (as.empty() || bs.empty()) return {};
+  const int len = as.size() + bs.size() - 1;
+  int n = 1;
+  for (; n < len; n <<= 1) {}
+  as.resize(n); fft(as);
+  bs.resize(n); fft(bs);
+  for (int i = 0; i < n; ++i) as[i] *= bs[i];
+  invFft(as);
+  as.resize(len);
+  return as;
+}
+vector<Mint> square(vector<Mint> as) {
+  if (as.empty()) return {};
+  const int len = as.size() + as.size() - 1;
+  int n = 1;
+  for (; n < len; n <<= 1) {}
+  as.resize(n); fft(as);
+  for (int i = 0; i < n; ++i) as[i] *= as[i];
+  invFft(as);
+  as.resize(len);
+  return as;
+}
+
+constexpr int LIM_INV = 1 << 20;  // @
+Mint inv[LIM_INV], fac[LIM_INV], invFac[LIM_INV];
+struct ModIntPreparator {
+  ModIntPreparator() {
+    inv[1] = 1;
+    for (int i = 2; i < LIM_INV; ++i) inv[i] = -((Mint::M / i) * inv[Mint::M % i]);
+    fac[0] = 1;
+    for (int i = 1; i < LIM_INV; ++i) fac[i] = fac[i - 1] * i;
+    invFac[0] = 1;
+    for (int i = 1; i < LIM_INV; ++i) invFac[i] = invFac[i - 1] * inv[i];
+  }
+} preparator;
+
+static constexpr int LIM_POLY = 1 << 20;  // @
+static_assert(LIM_POLY <= 1 << FFT_MAX, "Poly: LIM_POLY <= 1 << FFT_MAX must hold.");
+static Mint polyWork0[LIM_POLY], polyWork1[LIM_POLY], polyWork2[LIM_POLY], polyWork3[LIM_POLY];
+
+struct Poly : public vector<Mint> {
+  Poly() {}
+  explicit Poly(int n) : vector<Mint>(n) {}
+  Poly(const vector<Mint> &vec) : vector<Mint>(vec) {}
+  Poly(std::initializer_list<Mint> il) : vector<Mint>(il) {}
+  int size() const { return vector<Mint>::size(); }
+  Mint at(long long k) const { return (0 <= k && k < size()) ? (*this)[k] : 0U; }
+  int ord() const { for (int i = 0; i < size(); ++i) if ((*this)[i]) return i; return -1; }
+  int deg() const { for (int i = size(); --i >= 0; ) if ((*this)[i]) return i; return -1; }
+  Poly mod(int n) const { return Poly(vector<Mint>(data(), data() + min(n, size()))); }
+  friend std::ostream &operator<<(std::ostream &os, const Poly &fs) {
+    os << "[";
+    for (int i = 0; i < fs.size(); ++i) { if (i > 0) os << ", "; os << fs[i]; }
+    return os << "]";
+  }
+
+  Poly &operator+=(const Poly &fs) {
+    if (size() < fs.size()) resize(fs.size());
+    for (int i = 0; i < fs.size(); ++i) (*this)[i] += fs[i];
     return *this;
-}
-
-inline bignum& bignum::operator -=(const bignum& a){
-    list<int>::iterator i; list<int>::const_iterator j; int t = 0;
-    for (i=data.begin(),j=a.data.begin(); j!=a.data.end(); i++,j++){
-        *i -= t+*j; if (*i>=0) t=0; else *i+=__base, t=1;
-    }
-    while (i!=data.end()) {*i-=t; if (*i>=0) t=0;else *i+=__base, t=1; i++;}
-    (*this).do_trim();
+  }
+  Poly &operator-=(const Poly &fs) {
+    if (size() < fs.size()) resize(fs.size());
+    for (int i = 0; i < fs.size(); ++i) (*this)[i] -= fs[i];
     return *this;
-}
+  }
+  Poly &operator*=(const Poly &fs) {
+    if (empty() || fs.empty()) return *this = {};
+    const int nt = size(), nf = fs.size();
+    int n = 1;
+    for (; n < nt + nf - 1; n <<= 1) {}
+    assert(n <= LIM_POLY);
+    resize(n);
+    fft(data(), n);  // 1 E(n)
+    memcpy(polyWork0, fs.data(), nf * sizeof(Mint));
+    memset(polyWork0 + nf, 0, (n - nf) * sizeof(Mint));
+    fft(polyWork0, n);  // 1 E(n)
+    for (int i = 0; i < n; ++i) (*this)[i] *= polyWork0[i];
+    invFft(data(), n);  // 1 E(n)
+    resize(nt + nf - 1);
+    return *this;
+  }
+  Poly &operator/=(const Poly &fs) {
+    const int m = deg(), n = fs.deg();
+    assert(n != -1);
+    if (m < n) return *this = {};
+    Poly tsRev(m - n + 1), fsRev(min(m - n, n) + 1);
+    for (int i = 0; i <= m - n; ++i) tsRev[i] = (*this)[m - i];
+    for (int i = 0, i0 = min(m - n, n); i <= i0; ++i) fsRev[i] = fs[n - i];
+    const Poly qsRev = tsRev.div(fsRev, m - n + 1);  // 13 E(m - n + 1)
+    resize(m - n + 1);
+    for (int i = 0; i <= m - n; ++i) (*this)[i] = qsRev[m - n - i];
+    return *this;
+  }
+  Poly &operator%=(const Poly &fs) {
+    const Poly qs = *this / fs;  // 13 E(deg(t) - deg(f) + 1)
+    *this -= fs * qs;  // 3 E(|t|)
+    resize(deg() + 1);
+    return *this;
+  }
+  Poly &operator*=(const Mint &a) {
+    for (int i = 0; i < size(); ++i) (*this)[i] *= a;
+    return *this;
+  }
+  Poly &operator/=(const Mint &a) {
+    const Mint b = a.inv();
+    for (int i = 0; i < size(); ++i) (*this)[i] *= b;
+    return *this;
+  }
+  Poly operator+() const { return *this; }
+  Poly operator-() const {
+    Poly fs(size());
+    for (int i = 0; i < size(); ++i) fs[i] = -(*this)[i];
+    return fs;
+  }
+  Poly operator+(const Poly &fs) const { return (Poly(*this) += fs); }
+  Poly operator-(const Poly &fs) const { return (Poly(*this) -= fs); }
+  Poly operator*(const Poly &fs) const { return (Poly(*this) *= fs); }
+  Poly operator/(const Poly &fs) const { return (Poly(*this) /= fs); }
+  Poly operator%(const Poly &fs) const { return (Poly(*this) %= fs); }
+  Poly operator*(const Mint &a) const { return (Poly(*this) *= a); }
+  Poly operator/(const Mint &a) const { return (Poly(*this) /= a); }
+  friend Poly operator*(const Mint &a, const Poly &fs) { return fs * a; }
 
-inline bignum& bignum::operator +=(const int& a){
-    return (*this)+=bignum(a);
-}
-
-inline bignum& bignum::operator -=(const int& a){
-    return (*this)-=bignum(a);
-}
-
-inline bignum operator +(const bignum& a, const bignum& b){
-    list<int>::const_iterator i, j; bignum c; int t = 0;
-    for (i=a.data.begin(),j=b.data.begin(); i!=a.data.end()&&j!=b.data.end(); i++,j++){
-        c.data.push_back(t+*i+*j);
-        t=c.data.back()/__base; c.data.back()%=__base;
+  Poly inv(int n) const {
+    assert(!empty()); assert((*this)[0]); assert(1 <= n);
+    assert(n == 1 || 1 << (32 - __builtin_clz(n - 1)) <= LIM_POLY);
+    Poly fs(n);
+    fs[0] = (*this)[0].inv();
+    for (int m = 1; m < n; m <<= 1) {
+      memcpy(polyWork0, data(), min(m << 1, size()) * sizeof(Mint));
+      memset(polyWork0 + min(m << 1, size()), 0, ((m << 1) - min(m << 1, size())) * sizeof(Mint));
+      fft(polyWork0, m << 1);  // 2 E(n)
+      memcpy(polyWork1, fs.data(), min(m << 1, n) * sizeof(Mint));
+      memset(polyWork1 + min(m << 1, n), 0, ((m << 1) - min(m << 1, n)) * sizeof(Mint));
+      fft(polyWork1, m << 1);  // 2 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+      invFft(polyWork0, m << 1); // 2 E(n)
+      memset(polyWork0, 0, m * sizeof(Mint));
+      fft(polyWork0, m << 1); // 2 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+      invFft(polyWork0, m << 1); // 2 E(n)
+      for (int i = m, i0 = min(m << 1, n); i < i0; ++i) fs[i] = -polyWork0[i];
     }
-    while (i!=a.data.end()) {c.data.push_back(t+*i); t=c.data.back()/__base; c.data.back()%=__base; i++;}
-    while (j!=b.data.end()) {c.data.push_back(t+*j); t=c.data.back()/__base; c.data.back()%=__base; j++;}
-    if (t!=0) c.data.push_back(t);
+    return fs;
+  }
+  /*
+  Poly inv(int n) const {
+    assert(!empty()); assert((*this)[0]); assert(1 <= n);
+    assert(n == 1 || 3 << (31 - __builtin_clz(n - 1)) <= LIM_POLY);
+    assert(n <= 1 << (FFT_MAX - 1));
+    Poly fs(n);
+    fs[0] = (*this)[0].inv();
+    for (int h = 2, m = 1; m < n; ++h, m <<= 1) {
+      const Mint a = FFT_ROOTS[h], b = INV_FFT_ROOTS[h];
+      memcpy(polyWork0, data(), min(m << 1, size()) * sizeof(Mint));
+      memset(polyWork0 + min(m << 1, size()), 0, ((m << 1) - min(m << 1, size())) * sizeof(Mint));
+      {
+        Mint aa = 1;
+        for (int i = 0; i < m; ++i) { polyWork0[(m << 1) + i] = aa * polyWork0[i]; aa *= a; }
+        for (int i = 0; i < m; ++i) { polyWork0[(m << 1) + i] += aa * polyWork0[m + i]; aa *= a; }
+      }
+      fft(polyWork0, m << 1);  // 2 E(n)
+      fft(polyWork0 + (m << 1), m);  // 1 E(n)
+      memcpy(polyWork1, fs.data(), min(m << 1, n) * sizeof(Mint));
+      memset(polyWork1 + min(m << 1, n), 0, ((m << 1) - min(m << 1, n)) * sizeof(Mint));
+      {
+        Mint aa = 1;
+        for (int i = 0; i < m; ++i) { polyWork1[(m << 1) + i] = aa * polyWork1[i]; aa *= a; }
+        for (int i = 0; i < m; ++i) { polyWork1[(m << 1) + i] += aa * polyWork1[m + i]; aa *= a; }
+      }
+      fft(polyWork1, m << 1);  // 2 E(n)
+      fft(polyWork1 + (m << 1), m);  // 1 E(n)
+      for (int i = 0; i < (m << 1) + m; ++i) polyWork0[i] *= polyWork1[i] * polyWork1[i];
+      invFft(polyWork0, m << 1);  // 2 E(n)
+      invFft(polyWork0 + (m << 1), m);  // 1 E(n)
+      {
+        Mint bb = 1;
+        for (int i = 0, i0 = min(m, n - m); i < i0; ++i) {
+          unsigned x = polyWork0[i].x + (bb * polyWork0[(m << 1) + i]).x + MO2 - (fs[i].x << 1);  // < 4 MO
+          fs[m + i] = Mint(static_cast<unsigned long long>(FFT_ROOTS[2].x) * x) - polyWork0[m + i];
+          fs[m + i].x = ((fs[m + i].x & 1) ? (fs[m + i].x + MO) : fs[m + i].x) >> 1;
+          bb *= b;
+        }
+      }
+    }
+    return fs;
+  }
+  */
+  Poly div(const Poly &fs, int n) const {
+    assert(!fs.empty()); assert(fs[0]); assert(1 <= n);
+    if (n == 1) return {at(0) / fs[0]};
+    const int m = 1 << (31 - __builtin_clz(n - 1));
+    assert(m << 1 <= LIM_POLY);
+    Poly gs = fs.inv(m);  // 5 E(n)
+    gs.resize(m << 1);
+    fft(gs.data(), m << 1);  // 1 E(n)
+    memcpy(polyWork0, data(), min(m, size()) * sizeof(Mint));
+    memset(polyWork0 + min(m, size()), 0, ((m << 1) - min(m, size())) * sizeof(Mint));
+    fft(polyWork0, m << 1);  // 1 E(n)
+    for (int i = 0; i < m << 1; ++i) polyWork0[i] *= gs[i];
+    invFft(polyWork0, m << 1);  // 1 E(n)
+    Poly hs(n);
+    memcpy(hs.data(), polyWork0, m * sizeof(Mint));
+    memset(polyWork0 + m, 0, m * sizeof(Mint));
+    fft(polyWork0, m << 1);  // 1 E(n)
+    memcpy(polyWork1, fs.data(), min(m << 1, fs.size()) * sizeof(Mint));
+    memset(polyWork1 + min(m << 1, fs.size()), 0, ((m << 1) - min(m << 1, fs.size())) * sizeof(Mint));
+    fft(polyWork1, m << 1);  // 1 E(n)
+    for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+    invFft(polyWork0, m << 1);  // 1 E(n)
+    memset(polyWork0, 0, m * sizeof(Mint));
+    for (int i = m, i0 = min(m << 1, size()); i < i0; ++i) polyWork0[i] -= (*this)[i];
+    fft(polyWork0, m << 1);  // 1 E(n)
+    for (int i = 0; i < m << 1; ++i) polyWork0[i] *= gs[i];
+    invFft(polyWork0, m << 1);  // 1 E(n)
+    for (int i = m; i < n; ++i) hs[i] = -polyWork0[i];
+    return hs;
+  }
+  Mint divAt(const Poly &fs, long long k) const {
+    assert(k >= 0);
+    if (size() >= fs.size()) {
+      const Poly qs = *this / fs;  // 13 E(deg(t) - deg(f) + 1)
+      Poly rs = *this - fs * qs;  // 3 E(|t|)
+      rs.resize(rs.deg() + 1);
+      return qs.at(k) + rs.divAt(fs, k);
+    }
+    int h = 0, m = 1;
+    for (; m < fs.size(); ++h, m <<= 1) {}
+    if (k < m) {
+      const Poly gs = fs.inv(k + 1);  // 10 E(|f|)
+      Mint sum;
+      for (int i = 0, i0 = min<int>(k + 1, size()); i < i0; ++i) sum += (*this)[i] * gs[k - i];
+      return sum;
+    }
+    assert(m << 1 <= LIM_POLY);
+    polyWork0[0] = Mint(2U).inv();
+    for (int hh = 0; hh < h; ++hh) for (int i = 0; i < 1 << hh; ++i) polyWork0[1 << hh | i] = polyWork0[i] * INV_FFT_ROOTS[hh + 2];
+    const Mint a = FFT_ROOTS[h + 1];
+    memcpy(polyWork2, data(), size() * sizeof(Mint));
+    memset(polyWork2 + size(), 0, ((m << 1) - size()) * sizeof(Mint));
+    fft(polyWork2, m << 1);  // 2 E(|f|)
+    memcpy(polyWork1, fs.data(), fs.size() * sizeof(Mint));
+    memset(polyWork1 + fs.size(), 0, ((m << 1) - fs.size()) * sizeof(Mint));
+    fft(polyWork1, m << 1);  // 2 E(|f|)
+    for (; ; ) {
+      if (k & 1) {
+        for (int i = 0; i < m; ++i) polyWork2[i] = polyWork0[i] * (polyWork2[i << 1 | 0] * polyWork1[i << 1 | 1] - polyWork2[i << 1 | 1] * polyWork1[i << 1 | 0]);
+      } else {
+        for (int i = 0; i < m; ++i) {
+          polyWork2[i] = polyWork2[i << 1 | 0] * polyWork1[i << 1 | 1] + polyWork2[i << 1 | 1] * polyWork1[i << 1 | 0];
+          polyWork2[i].x = ((polyWork2[i].x & 1) ? (polyWork2[i].x + MO) : polyWork2[i].x) >> 1;
+        }
+      }
+      for (int i = 0; i < m; ++i) polyWork1[i] = polyWork1[i << 1 | 0] * polyWork1[i << 1 | 1];
+      if ((k >>= 1) < m) {
+        invFft(polyWork2, m);  // 1 E(|f|)
+        invFft(polyWork1, m);  // 1 E(|f|)
+        const Poly gs = Poly(vector<Mint>(polyWork1, polyWork1 + k + 1)).inv(k + 1);  // 10 E(|f|)
+        Mint sum;
+        for (int i = 0; i <= k; ++i) sum += polyWork2[i] * gs[k - i];
+        return sum;
+      }
+      memcpy(polyWork2 + m, polyWork2, m * sizeof(Mint));
+      invFft(polyWork2 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
+      memcpy(polyWork1 + m, polyWork1, m * sizeof(Mint));
+      invFft(polyWork1 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
+      Mint aa = 1;
+      for (int i = m; i < m << 1; ++i) { polyWork2[i] *= aa; polyWork1[i] *= aa; aa *= a; }
+      fft(polyWork2 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
+      fft(polyWork1 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
+    }
+  }
+  Poly log(int n) const {
+    assert(!empty()); assert((*this)[0].x == 1U); assert(n <= LIM_INV);
+    Poly fs = mod(n);
+    for (int i = 0; i < fs.size(); ++i) fs[i] *= i;
+    fs = fs.div(*this, n);
+    for (int i = 1; i < n; ++i) fs[i] *= ::inv[i];
+    return fs;
+  }
+  Poly exp(int n) const {
+    assert(!empty()); assert(!(*this)[0]); assert(1 <= n);
+    assert(n == 1 || 1 << (32 - __builtin_clz(n - 1)) <= min(LIM_INV, LIM_POLY));
+    if (n == 1) return {1U};
+    if (n == 2) return {1U, at(1)};
+    Poly fs(n);
+    fs[0].x = polyWork1[0].x = polyWork1[1].x = polyWork2[0].x = 1U;
+    int m;
+    for (m = 1; m << 1 < n; m <<= 1) {
+      for (int i = 0, i0 = min(m, size()); i < i0; ++i) polyWork0[i] = i * (*this)[i];
+      memset(polyWork0 + min(m, size()), 0, (m - min(m, size())) * sizeof(Mint));
+      fft(polyWork0, m);  // (1/2) E(n)
+      for (int i = 0; i < m; ++i) polyWork0[i] *= polyWork1[i];
+      invFft(polyWork0, m);  // (1/2) E(n)
+      for (int i = 0; i < m; ++i) polyWork0[i] -= i * fs[i];
+      memset(polyWork0 + m, 0, m * sizeof(Mint));
+      fft(polyWork0, m << 1);  // 1 E(n)
+      memcpy(polyWork3, polyWork2, m * sizeof(Mint));
+      memset(polyWork3 + m, 0, m * sizeof(Mint));
+      fft(polyWork3, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork3[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = 0; i < m; ++i) polyWork0[i] *= ::inv[m + i];
+      for (int i = 0, i0 = min(m, size() - m); i < i0; ++i) polyWork0[i] += (*this)[m + i];
+      memset(polyWork0 + m, 0, m * sizeof(Mint));
+      fft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      memcpy(fs.data() + m, polyWork0, m * sizeof(Mint));
+      memcpy(polyWork1, fs.data(), (m << 1) * sizeof(Mint));
+      memset(polyWork1 + (m << 1), 0, (m << 1) * sizeof(Mint));
+      fft(polyWork1, m << 2);  // 2 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] = polyWork1[i] * polyWork3[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      memset(polyWork0, 0, m * sizeof(Mint));
+      fft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork3[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = m; i < m << 1; ++i) polyWork2[i] = -polyWork0[i];
+    }
+    for (int i = 0, i0 = min(m, size()); i < i0; ++i) polyWork0[i] = i * (*this)[i];
+    memset(polyWork0 + min(m, size()), 0, (m - min(m, size())) * sizeof(Mint));
+    fft(polyWork0, m);  // (1/2) E(n)
+    for (int i = 0; i < m; ++i) polyWork0[i] *= polyWork1[i];
+    invFft(polyWork0, m);  // (1/2) E(n)
+    for (int i = 0; i < m; ++i) polyWork0[i] -= i * fs[i];
+    memcpy(polyWork0 + m, polyWork0 + (m >> 1), (m >> 1) * sizeof(Mint));
+    memset(polyWork0 + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    memset(polyWork0 + m + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    fft(polyWork0, m);  // (1/2) E(n)
+    fft(polyWork0 + m, m);  // (1/2) E(n)
+    memcpy(polyWork3 + m, polyWork2 + (m >> 1), (m >> 1) * sizeof(Mint));
+    memset(polyWork3 + m + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    fft(polyWork3 + m, m);  // (1/2) E(n)
+    for (int i = 0; i < m; ++i) polyWork0[m + i] = polyWork0[i] * polyWork3[m + i] + polyWork0[m + i] * polyWork3[i];
+    for (int i = 0; i < m; ++i) polyWork0[i] *= polyWork3[i];
+    invFft(polyWork0, m);  // (1/2) E(n)
+    invFft(polyWork0 + m, m);  // (1/2) E(n)
+    for (int i = 0; i < m >> 1; ++i) polyWork0[(m >> 1) + i] += polyWork0[m + i];
+    for (int i = 0; i < m; ++i) polyWork0[i] *= ::inv[m + i];
+    for (int i = 0, i0 = min(m, size() - m); i < i0; ++i) polyWork0[i] += (*this)[m + i];
+    memset(polyWork0 + m, 0, m * sizeof(Mint));
+    fft(polyWork0, m << 1);  // 1 E(n)
+    for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+    invFft(polyWork0, m << 1);  // 1 E(n)
+    memcpy(fs.data() + m, polyWork0, (n - m) * sizeof(Mint));
+    return fs;
+  }
+  Poly pow(Mint a, int n) const {
+    assert(!empty()); assert((*this)[0].x == 1U); assert(1 <= n);
+    return (a * log(n)).exp(n);  // 13 E(n) + (16 + 1/2) E(n)
+  }
+  Poly pow(long long a, int n) const {
+    assert(a >= 0); assert(1 <= n);
+    if (a == 0) { Poly gs(n); gs[0].x = 1U; return gs; }
+    const int o = ord();
+    if (o == -1 || o > (n - 1) / a) return Poly(n);
+    const Mint b = (*this)[o].inv(), c = (*this)[o].pow(a);
+    const int ntt = min<int>(n - a * o, size() - o);
+    Poly tts(ntt);
+    for (int i = 0; i < ntt; ++i) tts[i] = b * (*this)[o + i];
+    tts = tts.pow(Mint(a), n - a * o);  // (29 + 1/2) E(n - a ord(t))
+    Poly gs(n);
+    for (int i = 0; i < n - a * o; ++i) gs[a * o + i] = c * tts[i];
+    return gs;
+  }
+  Poly sqrt(int n) const {
+    assert(!empty()); assert((*this)[0].x == 1U); assert(1 <= n);
+    assert(n == 1 || 1 << (32 - __builtin_clz(n - 1)) <= LIM_POLY);
+    if (n == 1) return {1U};
+    if (n == 2) return {1U, at(1) / 2};
+    Poly fs(n);
+    fs[0].x = polyWork1[0].x = polyWork2[0].x = 1U;
+    int m;
+    for (m = 1; m << 1 < n; m <<= 1) {
+      for (int i = 0; i < m; ++i) polyWork1[i] *= polyWork1[i];
+      invFft(polyWork1, m);  // (1/2) E(n)
+      for (int i = 0, i0 = min(m, size()); i < i0; ++i) polyWork1[i] -= (*this)[i];
+      for (int i = 0, i0 = min(m, size() - m); i < i0; ++i) polyWork1[i] -= (*this)[m + i];
+      memset(polyWork1 + m, 0, m * sizeof(Mint));
+      fft(polyWork1, m << 1);  // 1 E(n)
+      memcpy(polyWork3, polyWork2, m * sizeof(Mint));
+      memset(polyWork3 + m, 0, m * sizeof(Mint));
+      fft(polyWork3, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork1[i] *= polyWork3[i];
+      invFft(polyWork1, m << 1);  // 1 E(n)
+      for (int i = 0; i < m; ++i) { polyWork1[i] = -polyWork1[i]; fs[m + i].x = ((polyWork1[i].x & 1) ? (polyWork1[i].x + MO) : polyWork1[i].x) >> 1; }
+      memcpy(polyWork1, fs.data(), (m << 1) * sizeof(Mint));
+      fft(polyWork1, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] = polyWork1[i] * polyWork3[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      memset(polyWork0, 0, m * sizeof(Mint));
+      fft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork3[i];
+      invFft(polyWork0, m << 1);  // 1 E(n)
+      for (int i = m; i < m << 1; ++i) polyWork2[i] = -polyWork0[i];
+    }
+    for (int i = 0; i < m; ++i) polyWork1[i] *= polyWork1[i];
+    invFft(polyWork1, m);  // (1/2) E(n)
+    for (int i = 0, i0 = min(m, size()); i < i0; ++i) polyWork1[i] -= (*this)[i];
+    for (int i = 0, i0 = min(m, size() - m); i < i0; ++i) polyWork1[i] -= (*this)[m + i];
+    memcpy(polyWork1 + m, polyWork1 + (m >> 1), (m >> 1) * sizeof(Mint));
+    memset(polyWork1 + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    memset(polyWork1 + m + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    fft(polyWork1, m);  // (1/2) E(n)
+    fft(polyWork1 + m, m);  // (1/2) E(n)
+    memcpy(polyWork3 + m, polyWork2 + (m >> 1), (m >> 1) * sizeof(Mint));
+    memset(polyWork3 + m + (m >> 1), 0, (m >> 1) * sizeof(Mint));
+    fft(polyWork3 + m, m);  // (1/2) E(n)
+    for (int i = 0; i < m; ++i) polyWork1[m + i] = polyWork1[i] * polyWork3[m + i] + polyWork1[m + i] * polyWork3[i];
+    for (int i = 0; i < m; ++i) polyWork1[i] *= polyWork3[i];
+    invFft(polyWork1, m);  // (1/2) E(n)
+    invFft(polyWork1 + m, m);  // (1/2) E(n)
+    for (int i = 0; i < m >> 1; ++i) polyWork1[(m >> 1) + i] += polyWork1[m + i];
+    for (int i = 0; i < n - m; ++i) { polyWork1[i] = -polyWork1[i]; fs[m + i].x = ((polyWork1[i].x & 1) ? (polyWork1[i].x + MO) : polyWork1[i].x) >> 1; }
+    return fs;
+  }
+  template <class F> Poly sqrt(int n, F modSqrt) const {
+    assert(1 <= n);
+    const int o = ord();
+    if (o == -1) return Poly(n);
+    if (o & 1) return {};
+    const Mint c = modSqrt((*this)[o]);
+    if (c * c != (*this)[o]) return {};
+    if (o >> 1 >= n) return Poly(n);
+    const Mint b = (*this)[o].inv();
+    const int ntt = min(n - (o >> 1), size() - o);
+    Poly tts(ntt);
+    for (int i = 0; i < ntt; ++i) tts[i] = b * (*this)[o + i];
+    tts = tts.sqrt(n - (o >> 1));  // (10 + 1/2) E(n)
+    Poly gs(n);
+    for (int i = 0; i < n - (o >> 1); ++i) gs[(o >> 1) + i] = c * tts[i];
+    return gs;
+  }
+  Poly shift(const Mint &a) const {
+    if (empty()) return {};
+    const int n = size();
+    int m = 1;
+    for (; m < n; m <<= 1) {}
+    for (int i = 0; i < n; ++i) polyWork0[i] = fac[i] * (*this)[i];
+    memset(polyWork0 + n, 0, ((m << 1) - n) * sizeof(Mint));
+    fft(polyWork0, m << 1);  // 2 E(|t|)
+    {
+      Mint aa = 1;
+      for (int i = 0; i < n; ++i) { polyWork1[n - 1 - i] = invFac[i] * aa; aa *= a; }
+    }
+    memset(polyWork1 + n, 0, ((m << 1) - n) * sizeof(Mint));
+    fft(polyWork1, m << 1);  // 2 E(|t|)
+    for (int i = 0; i < m << 1; ++i) polyWork0[i] *= polyWork1[i];
+    invFft(polyWork0, m << 1);  // 2 E(|t|)
+    Poly fs(n);
+    for (int i = 0; i < n; ++i) fs[i] = invFac[i] * polyWork0[n - 1 + i];
+    return fs;
+  }
+};
+
+Mint linearRecurrenceAt(const vector<Mint> &as, const vector<Mint> &cs, long long k) {
+  assert(!cs.empty()); assert(cs[0]);
+  const int d = cs.size() - 1;
+  assert(as.size() >= static_cast<size_t>(d));
+  return (Poly(vector<Mint>(as.begin(), as.begin() + d)) * cs).mod(d).divAt(cs, k);
+}
+
+struct SubproductTree {
+  int logN, n, nn;
+  vector<Mint> xs;
+  vector<Mint> buf;
+  vector<Mint *> gss;
+  Poly all;
+  SubproductTree(const vector<Mint> &xs_) {
+    n = xs_.size();
+    for (logN = 0, nn = 1; nn < n; ++logN, nn <<= 1) {}
+    xs.assign(nn, 0U);
+    memcpy(xs.data(), xs_.data(), n * sizeof(Mint));
+    buf.assign((logN + 1) * (nn << 1), 0U);
+    gss.assign(nn << 1, nullptr);
+    for (int h = 0; h <= logN; ++h) for (int u = 1 << h; u < 1 << (h + 1); ++u) {
+      gss[u] = buf.data() + (h * (nn << 1) + ((u - (1 << h)) << (logN - h + 1)));
+    }
+    for (int i = 0; i < nn; ++i) {
+      gss[nn + i][0] = -xs[i] + 1;
+      gss[nn + i][1] = -xs[i] - 1;
+    }
+    if (nn == 1) gss[1][1] += 2;
+    for (int h = logN; --h >= 0; ) {
+      const int m = 1 << (logN - h);
+      for (int u = 1 << (h + 1); --u >= 1 << h; ) {
+        for (int i = 0; i < m; ++i) gss[u][i] = gss[u << 1][i] * gss[u << 1 | 1][i];
+        memcpy(gss[u] + m, gss[u], m * sizeof(Mint));
+        invFft(gss[u] + m, m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        if (h > 0) {
+          gss[u][m] -= 2;
+          const Mint a = FFT_ROOTS[logN - h + 1];
+          Mint aa = 1;
+          for (int i = m; i < m << 1; ++i) { gss[u][i] *= aa; aa *= a; };
+          fft(gss[u] + m, m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        }
+      }
+    }
+    all.resize(nn + 1);
+    all[0] = 1;
+    for (int i = 1; i < nn; ++i) all[i] = gss[1][nn + nn - i];
+    all[nn] = gss[1][nn] - 1;
+  }
+  vector<Mint> multiEval(const Poly &fs) const {
+    vector<Mint> work0(nn), work1(nn), work2(nn);
+    {
+      const int m = max(fs.size(), 1);
+      auto invAll = all.inv(m);  // 10 E(|f|)
+      std::reverse(invAll.begin(), invAll.end());
+      int mm;
+      for (mm = 1; mm < m - 1 + nn; mm <<= 1) {}
+      invAll.resize(mm, 0U);
+      fft(invAll);  // E(|f| + 2^(ceil(log_2 n)))
+      vector<Mint> ffs(mm, 0U);
+      memcpy(ffs.data(), fs.data(), fs.size() * sizeof(Mint));
+      fft(ffs);  // E(|f| + 2^(ceil(log_2 n)))
+      for (int i = 0; i < mm; ++i) ffs[i] *= invAll[i];
+      invFft(ffs);  // E(|f| + 2^(ceil(log_2 n)))
+      memcpy(((logN & 1) ? work1 : work0).data(), ffs.data() + m - 1, nn * sizeof(Mint));
+    }
+    for (int h = 0; h < logN; ++h) {
+      const int m = 1 << (logN - h);
+      for (int u = 1 << h; u < 1 << (h + 1); ++u) {
+        Mint *hs = (((logN - h) & 1) ? work1 : work0).data() + ((u - (1 << h)) << (logN - h));
+        Mint *hs0 = (((logN - h) & 1) ? work0 : work1).data() + ((u - (1 << h)) << (logN - h));
+        Mint *hs1 = hs0 + (m >> 1);
+        fft(hs, m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        for (int i = 0; i < m; ++i) work2[i] = gss[u << 1 | 1][i] * hs[i];
+        invFft(work2.data(), m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        memcpy(hs0, work2.data() + (m >> 1), (m >> 1) * sizeof(Mint));
+        for (int i = 0; i < m; ++i) work2[i] = gss[u << 1][i] * hs[i];
+        invFft(work2.data(), m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        memcpy(hs1, work2.data() + (m >> 1), (m >> 1) * sizeof(Mint));
+      }
+    }
+    work0.resize(n);
+    return work0;
+  }
+  Poly interpolate(const vector<Mint> &ys) const {
+    assert(static_cast<int>(ys.size()) == n);
+    Poly gs(n);
+    for (int i = 0; i < n; ++i) gs[i] = (i + 1) * all[n - (i + 1)];
+    const vector<Mint> denoms = multiEval(gs);  // ((3/2) ceil(log_2 n) + O(1)) E(n)
+    vector<Mint> work(nn << 1, 0U);
+    for (int i = 0; i < n; ++i) {
+      assert(denoms[i]);
+      work[i << 1] = work[i << 1 | 1] = ys[i] / denoms[i];
+    }
+    for (int h = logN; --h >= 0; ) {
+      const int m = 1 << (logN - h);
+      for (int u = 1 << (h + 1); --u >= 1 << h; ) {
+        Mint *hs = work.data() + ((u - (1 << h)) << (logN - h + 1));
+        for (int i = 0; i < m; ++i) hs[i] = gss[u << 1 | 1][i] * hs[i] + gss[u << 1][i] * hs[m + i];
+        if (h > 0) {
+          memcpy(hs + m, hs, m * sizeof(Mint));
+          invFft(hs + m, m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+          const Mint a = FFT_ROOTS[logN - h + 1];
+          Mint aa = 1;
+          for (int i = m; i < m << 1; ++i) { hs[i] *= aa; aa *= a; };
+          fft(hs + m, m);  // ((1/2) ceil(log_2 n) + O(1)) E(n)
+        }
+      }
+    }
+    invFft(work.data(), nn);  // E(n)
+    return Poly(vector<Mint>(work.data() + nn - n, work.data() + nn));
+  }
+};
+
+
+namespace lastweapon {
+
+namespace NT{
+inline LL gcd(LL a, LL b){return b?gcd(b,a%b):a;}
+inline LL lcm(LL a, LL b){return a*b/gcd(a,b);}
+
+inline void INC(int &a, int b){a += b; if (a >= MOD) a -= MOD;}
+inline int sum(int a, int b){a += b; if (a >= MOD) a -= MOD; return a;}
+
+inline void DEC(int &a, int b){a -= b; if (a < 0) a += MOD;}
+inline int dff(int a, int b){a -= b; if (a < 0) a  += MOD; return a;}
+inline void MUL(int &a, int b){a = (LL)a * b % MOD;}
+inline int pdt(int x,int y) {
+    int ret; __asm__ __volatile__ ("\tmull %%ebx\n\tdivl %%ecx\n":"=d"(ret):"a"(x),"b"(y),"c"(MOD));
+    return ret;
+}
+
+
+inline int gcd(int m, int n, int &x, int &y){
+
+    x = 1, y = 0; int xx = 0, yy = 1, q;
+
+    while (1){
+        q = m / n, m %= n;
+        if (!m){x = xx, y = yy; return n;}
+        DEC(x, pdt(q, xx)), DEC(y, pdt(q, yy));
+        q = n / m, n %= m;
+        if (!n) return m;
+        DEC(xx, pdt(q, x)), DEC(yy, pdt(q, y));
+    }
+}
+
+inline int sum(int a, int b, int c){return sum(a, sum(b, c));}
+inline int sum(int a, int b, int c, int d){return sum(sum(a, b), sum(c, d));}
+inline int pdt(int a, int b, int c){return pdt(a, pdt(b, c));}
+inline int pdt(int a, int b, int c, int d){return pdt(pdt(a, b), pdt(c, d));}
+
+inline int pow(int a, LL b){
+    int c(1); while (b){
+        if (b&1) MUL(c, a);
+        MUL(a, a), b >>= 1;
+    }
     return c;
 }
 
-inline bignum operator -(const bignum& a, const bignum& b){
-    list<int>::const_iterator i, j; bignum c; int t = 0;
-    for (i=a.data.begin(),j=b.data.begin(); j!=b.data.end(); i++,j++){
-        t = *i - t;
-        if (t>=*j) c.data.push_back(t-*j), t=0;
-        else c.data.push_back(t+__base-*j), t=1;
-    }
-    while (i!=a.data.end()) {t=*i-t; if (t>=0) c.data.push_back(t), t=0;else c.data.push_back(t+__base), t=1; i++;}
-    c.do_trim();
-    return c;
-}
-
-inline bignum operator *(const bignum& a, const bignum& b){
-    list<int>::const_iterator i, j; list<int>::iterator k, kk; bignum c; long long t = 0;
-
-    for (int i=0;i<a.data.size()+b.data.size();i++) c.data.push_back(0);
-    for (i=a.data.begin(),k=c.data.begin(); i!=a.data.end(); i++,k++){
-        for (j=b.data.begin(),kk=k; j!=b.data.end(); j++,kk++){
-            t+=(long long)(*i)*(*j)+(*kk);
-            *kk=int(t%__base); t/=__base;
-        }
-        *kk+=t; t=0;
-    }
-    c.do_trim();
-    return c;
-}
-
-inline int bignum::do_try(const bignum& a){
-    int l = 1, r = 99999999, m, t;
-    while (l+2<r){
-        m = (l + r) / 2;
-        t = do_comp(*this, a*bignum(m));
-        if (t==0) return m;
-        if (t<0) r = m - 1;
-        else l = m;
-    }
-    while (do_comp(*this, a*bignum(r))<0) r--;
-    return r;
-}
-
-inline void divide(const bignum& a, const bignum& b, bignum& d, bignum& r){
-    list<int>::const_reverse_iterator i = a.data.rbegin(); int t;
-    d = bignum(0); r = bignum(0);
-    do {
-        while (r<b&&i!=a.data.rend()){d.data.push_front(0);r.data.push_front(*i);r.do_trim();i++;}
-        if (r>=b){
-            t = r.do_try(b); d.data.front() = t;
-            r-=(b*bignum(t));
-        }
-    } while (i!=a.data.rend());
-    d.do_trim();
-}
-
-inline bignum operator /(const bignum& a, const bignum& b){
-    bignum d, r;
-    divide(a, b, d, r);
-    return d;
-}
-
-inline bignum operator %(const bignum& a, const bignum& b){
-    bignum d, r;
-    divide(a, b, d, r);
-    return r;
-}
-
-inline bignum operator +(const bignum& a, const int& b){
-    return a+bignum(b);
-}
-
-inline bignum operator -(const bignum& a, const int& b){
-    return a-bignum(b);
-}
-
-inline bignum operator *(const bignum& a, const int& b){
-    return a*bignum(b);
-}
-
-inline bignum operator /(const bignum& a, const int& b){
-    return a/bignum(b);
-}
-
-inline bignum operator %(const bignum& a, const int& b){
-    return a%bignum(b);
-}
-
-inline bignum& bignum::operator *=(const bignum& a){
-    (*this) = (*this) * a;
-    return *this;
-}
-
-inline bignum& bignum::operator /=(const bignum& a){
-    (*this) = (*this) / a;
-    return *this;
-}
-
-inline bignum& bignum::operator %=(const bignum& a){
-    (*this) = (*this) % a;
-    return *this;
-}
-
-inline bignum& bignum::operator *=(const int& a){
-    return (*this)*=bignum(a);
-}
-
-inline bignum& bignum::operator /=(const int& a){
-    return (*this)/=bignum(a);
-}
-
-inline bignum& bignum::operator %=(const int& a){
-    return (*this)%=bignum(a);
-}
-
-inline bignum pow(bignum a,int b){
-    bignum c(1);
-    while (b!=0) {
+template<class T> inline T pow(T a, LL b){
+    T c(1); while (b){
         if (b&1) c *= a;
-        a = a * a; b >>= 1;
+        a *= a, b >>= 1;
     }
     return c;
 }
-inline bignum pow(int a, int b){
-    return pow(bignum(a), b);
+
+template<class T> inline T pow(T a, int b){
+    return pow(a, (LL)b);
 }
+
+inline int _I(int b){
+    int a = MOD, x1 = 0, x2 = 1, q; while (1){
+        q = a / b, a %= b;
+        if (!a) return x2;
+        DEC(x1, pdt(q, x2));
+
+        q = b / a, b %= a;
+        if (!b) return x1;
+        DEC(x2, pdt(q, x1));
+    }
+}
+
+inline void DIV(int &a, int b){MUL(a, _I(b));}
+inline int qtt(int a, int b){return pdt(a, _I(b));}
+
+struct Int{
+    int val;
+
+    operator int() const{return val;}
+
+    Int(int _val = 0):val(_val){
+        val %= MOD; if (val < 0) val += MOD;
+    }
+    Int(LL _val):val(_val){
+        _val %= MOD; if (_val < 0) _val += MOD;
+        val = _val;
+    }
+
+    Int& operator +=(const int& rhs){INC(val, rhs);rTs;}
+    Int operator +(const int& rhs) const{return sum(val, rhs);}
+    Int& operator -=(const int& rhs){DEC(val, rhs);rTs;}
+    Int operator -(const int& rhs) const{return dff(val, rhs);}
+    Int& operator *=(const int& rhs){MUL(val, rhs);rTs;}
+    Int operator *(const int& rhs) const{return pdt(val, rhs);}
+    Int& operator /=(const int& rhs){DIV(val, rhs);rTs;}
+    Int operator /(const int& rhs) const{return qtt(val, rhs);}
+    Int operator-()const{return MOD-*this;}
+};
+
+} using namespace NT;//}
 
 }  // namespace lastweapon
 
-
 using namespace lastweapon;
 
-const int N = 20;
-int a[N][N], b[N][N]; bool v[N][N];
-int n, m; bignum z;
+const int N = int(1e2) + 9;
 
-int f(){
-	int z = 0; RST(v);
-	REP(i, n) REP(j, m) if (!v[i][j]) {
-        int x = i, y = j;  do {
-            v[x][y] = true;  int t = a[x][y];
-            x = t / m, y = t % m;
-        } while (!v[x][y]);
-        ++z;
-    }
-	return z;
-
-}
-
-void rt90(){
-	CPY(b, a); REP(i, n) REP(j, m) a[j][n-i-1] = b[i][j];
-	swap(n, m);
-}
-
-void rt180(){
-	rt90(); rt90();
-}
-
-void rolln(){
-	CPY(b, a); REP(i, n) REP(j, m) a[i][j] = b[(i+1)%n][j];
-}
-
-void rollm(){
-	CPY(b, a); REP(i, n) REP(j, m) a[i][j] = b[i][(j+1)%m];
-}
-
-void init(){
-	REP(i, n) REP(j, m) a[i][j] = i*m + j; z = 0;
-}
-
-void Polay(){
-	if (n==m){
-		for (int k=0;k<4;k++,rt90())
-			for (int i=0;i<n;i++,rolln())
-				for (int j=0;j<m;j++,rollm())
-					z += pow(bignum(2), f());
-		z /= 4*n*m;
-	}
-	else {
-		for (int k=0;k<2;k++,rt180())
-			for (int i=0;i<n;i++,rolln())
-				for (int j=0;j<m;j++,rollm())
-					z += pow(bignum(2), f());
-		z /= 2*n*m;
-	}
+LL C2(LL n) {
+    return n*(n-1)/2;
 }
 
 int main() {
-
 #ifndef ONLINE_JUDGE
     //freopen("in.txt", "r", stdin);
 #endif
+    int n; RD(n)++;
 
-    while (scanf("%d %d", &n, &m) != EOF){
-		init(); Polay();
-		cout << z << endl;
-	}
+    Poly F(n); Mint i2 = invFac[2];
+
+    FOR(i, 1, n) {
+        F[i] = invFac[i] * pow(i2, C2(i));
+        if (i&1) F[i] = -F[i];
+    }
+
+    F[0] += 1; F = F.inv(n);
+    REP_1(i, n) F[i] *= pow(Mint(2), C2(i));
+    F = F.log(n);
+
+    --n;
+    REP_1(i, n) {
+        cout << F[i] * fac[i] << endl;
+    }
 }
