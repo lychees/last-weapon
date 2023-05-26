@@ -1,6 +1,5 @@
 #ifndef LASTWEAPON_POLY_HPP
 #define LASTWEAPON_POLY_HPP 1
-
 #include "lastweapon/io"
 
 // namespace lastweapon {
@@ -45,6 +44,7 @@ template <unsigned M_> struct ModInt {
 ////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////
+
 constexpr unsigned MO = 998244353U;
 constexpr unsigned MO2 = 2U * MO;
 constexpr int FFT_MAX = 23;
@@ -53,6 +53,17 @@ constexpr Mint FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 911660635U, 372528824U,
 constexpr Mint INV_FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 86583718U, 509520358U, 337190230U, 87557064U, 609441965U, 135236158U, 304459705U, 685443576U, 381598368U, 335559352U, 129292727U, 358024708U, 814576206U, 708402881U, 283043518U, 3707709U, 121392023U, 704923114U, 950391366U, 428961804U, 382752275U, 469870224U};
 constexpr Mint FFT_RATIOS[FFT_MAX] = {911660635U, 509520358U, 369330050U, 332049552U, 983190778U, 123842337U, 238493703U, 975955924U, 603855026U, 856644456U, 131300601U, 842657263U, 730768835U, 942482514U, 806263778U, 151565301U, 510815449U, 503497456U, 743006876U, 741047443U, 56250497U, 867605899U};
 constexpr Mint INV_FFT_RATIOS[FFT_MAX] = {86583718U, 372528824U, 373294451U, 645684063U, 112220581U, 692852209U, 155456985U, 797128860U, 90816748U, 860285882U, 927414960U, 354738543U, 109331171U, 293255632U, 535113200U, 308540755U, 121186627U, 608385704U, 438932459U, 359477183U, 824071951U, 103369235U};
+
+/*
+constexpr unsigned MO =  1004535809U;
+constexpr unsigned MO2 = 2U * MO;
+constexpr int FFT_MAX = 21;
+using Mint = ModInt<MO>;
+constexpr Mint FFT_ROOTS[FFT_MAX + 1] = {1U, 1004535808U, 483363861U, 395918948U, 691095095U, 67253981U, 89059135U, 337291080U, 317143553U, 8295483U, 327081633U, 714163887U, 295244910U, 2062645U, 524615618U, 333849333U, 50393163U, 925609281U, 615614863U, 862977694U, 848723745U, 702606812U};
+constexpr Mint INV_FFT_ROOTS[FFT_MAX + 1] = {1U, 1004535808U, 521171948U, 181280972U, 440257849U, 236219887U, 412852222U, 174881506U, 581383828U, 870703586U, 216733913U, 278605116U, 200320826U, 58507845U, 191870395U, 411091405U, 755911120U, 816727090U, 689146186U, 353531124U, 97543274U, 700146880U};
+constexpr Mint FFT_RATIOS[FFT_MAX] = {483363861U, 181280972U, 517765470U, 89836266U, 555820998U, 452781753U, 775939161U, 240583721U, 316199902U, 663813733U, 123325259U, 333317974U, 237423280U, 77061338U, 785227561U, 317445082U, 398519305U, 22415135U, 94458470U, 719009841U};
+constexpr Mint INV_FFT_RATIOS[FFT_MAX] = {521171948U, 395918948U, 232236581U, 237230421U, 224910463U, 354315367U, 838316360U, 950996795U, 850581318U, 901398244U, 348478829U, 346227001U, 400741340U, 1003986296U, 423186697U, 870066632U, 5313248U, 594306560U, 924324899U, 674933703U};
+*/
 
 // as[rev(i)] <- \sum_j \zeta^(ij) as[j]
 void fft(Mint *as, int n) {
@@ -274,6 +285,14 @@ struct Poly : public vector<Mint> {
     resize(deg() + 1);
     return *this;
   }
+  Poly &operator+=(const Mint fs) {
+    (*this)[0] += fs;
+    return *this;
+  }
+  Poly &operator-=(const Mint fs) {
+    (*this)[0] -= fs;
+    return *this;
+  }
   Poly &operator*=(const Mint &a) {
     for (int i = 0; i < size(); ++i) (*this)[i] *= a;
     return *this;
@@ -294,13 +313,16 @@ struct Poly : public vector<Mint> {
   Poly operator*(const Poly &fs) const { return (Poly(*this) *= fs); }
   Poly operator/(const Poly &fs) const { return (Poly(*this) /= fs); }
   Poly operator%(const Poly &fs) const { return (Poly(*this) %= fs); }
+  Poly operator+(const Mint &fs) const { return (Poly(*this) += fs); }
+  Poly operator-(const Mint &fs) const { return (Poly(*this) -= fs); }
   Poly operator*(const Mint &a) const { return (Poly(*this) *= a); }
   Poly operator/(const Mint &a) const { return (Poly(*this) /= a); }
   friend Poly operator*(const Mint &a, const Poly &fs) { return fs * a; }
 
   // 10 E(n)
   // f <- f - (t f - 1) f
-  Poly inv(int n) const {
+  Poly inv(int n = -1) const {
+    if (n == -1) n = size();
     assert(!empty()); assert((*this)[0]); assert(1 <= n);
     assert(n == 1 || 1 << (32 - __builtin_clz(n - 1)) <= LIM_POLY);
     Poly fs(n);
@@ -462,9 +484,24 @@ struct Poly : public vector<Mint> {
       fft(polyWork1 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
     }
   }
+
+
+  Poly D() const {
+    Poly f(max(size() - 1, 1));
+    for (int i = 1; i < size(); ++i) f[i - 1] = i * (*this)[i];
+    return f;
+  }
+
+  Poly I() const {
+    Poly f(size() + 1);
+    for (int i = 0; i < size(); ++i) f[i + 1] = ::inv[i + 1] * (*this)[i];
+    return f;
+  }
+
   // 13 E(n)
   // D log(t) = (D t) / t
-  Poly log(int n) const {
+  Poly log(int n = -1) const {
+    if (n == -1) n = size();
     assert(!empty()); assert((*this)[0].x == 1U); assert(n <= LIM_INV);
     Poly fs = mod(n);
     for (int i = 0; i < fs.size(); ++i) fs[i] *= i;
@@ -481,7 +518,8 @@ struct Poly : public vector<Mint> {
   //   =  f - (I (g (D f - f D (t mod x^m)) + D (t mod x^m)) - t) f
   // g <- g - (f g - 1) g
   // polyWork1: DFT(f, 2 m), polyWork2: g, polyWork3: DFT(g, 2 m)
-  Poly exp(int n) const {
+  Poly exp(int n = -1) const {
+    if (n == -1) n = size();
     assert(!empty()); assert(!(*this)[0]); assert(1 <= n);
     assert(n == 1 || 1 << (32 - __builtin_clz(n - 1)) <= min(LIM_INV, LIM_POLY));
     if (n == 1) return {1U};

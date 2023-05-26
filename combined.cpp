@@ -1,4 +1,3 @@
-
 /*
     Last Weapon is my own algorithms library for competitive programming, it is a fork from ACL with some alternative algorithms and additional features. Use it at your own risk.
     Repo: https://github.com/lychees/last-weapon
@@ -309,6 +308,7 @@ template <unsigned M_> struct ModInt {
   friend std::ostream &operator<<(std::ostream &os, const ModInt &a) { return os << a.x; }
 };
 
+
 constexpr unsigned MO = 998244353U;
 constexpr unsigned MO2 = 2U * MO;
 constexpr int FFT_MAX = 23;
@@ -317,6 +317,17 @@ constexpr Mint FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 911660635U, 372528824U,
 constexpr Mint INV_FFT_ROOTS[FFT_MAX + 1] = {1U, 998244352U, 86583718U, 509520358U, 337190230U, 87557064U, 609441965U, 135236158U, 304459705U, 685443576U, 381598368U, 335559352U, 129292727U, 358024708U, 814576206U, 708402881U, 283043518U, 3707709U, 121392023U, 704923114U, 950391366U, 428961804U, 382752275U, 469870224U};
 constexpr Mint FFT_RATIOS[FFT_MAX] = {911660635U, 509520358U, 369330050U, 332049552U, 983190778U, 123842337U, 238493703U, 975955924U, 603855026U, 856644456U, 131300601U, 842657263U, 730768835U, 942482514U, 806263778U, 151565301U, 510815449U, 503497456U, 743006876U, 741047443U, 56250497U, 867605899U};
 constexpr Mint INV_FFT_RATIOS[FFT_MAX] = {86583718U, 372528824U, 373294451U, 645684063U, 112220581U, 692852209U, 155456985U, 797128860U, 90816748U, 860285882U, 927414960U, 354738543U, 109331171U, 293255632U, 535113200U, 308540755U, 121186627U, 608385704U, 438932459U, 359477183U, 824071951U, 103369235U};
+
+/*
+constexpr unsigned MO =  1004535809U;
+constexpr unsigned MO2 = 2U * MO;
+constexpr int FFT_MAX = 21;
+using Mint = ModInt<MO>;
+constexpr Mint FFT_ROOTS[FFT_MAX + 1] = {1U, 1004535808U, 483363861U, 395918948U, 691095095U, 67253981U, 89059135U, 337291080U, 317143553U, 8295483U, 327081633U, 714163887U, 295244910U, 2062645U, 524615618U, 333849333U, 50393163U, 925609281U, 615614863U, 862977694U, 848723745U, 702606812U};
+constexpr Mint INV_FFT_ROOTS[FFT_MAX + 1] = {1U, 1004535808U, 521171948U, 181280972U, 440257849U, 236219887U, 412852222U, 174881506U, 581383828U, 870703586U, 216733913U, 278605116U, 200320826U, 58507845U, 191870395U, 411091405U, 755911120U, 816727090U, 689146186U, 353531124U, 97543274U, 700146880U};
+constexpr Mint FFT_RATIOS[FFT_MAX] = {483363861U, 181280972U, 517765470U, 89836266U, 555820998U, 452781753U, 775939161U, 240583721U, 316199902U, 663813733U, 123325259U, 333317974U, 237423280U, 77061338U, 785227561U, 317445082U, 398519305U, 22415135U, 94458470U, 719009841U};
+constexpr Mint INV_FFT_RATIOS[FFT_MAX] = {521171948U, 395918948U, 232236581U, 237230421U, 224910463U, 354315367U, 838316360U, 950996795U, 850581318U, 901398244U, 348478829U, 346227001U, 400741340U, 1003986296U, 423186697U, 870066632U, 5313248U, 594306560U, 924324899U, 674933703U};
+*/
 
 void fft(Mint *as, int n) {
   assert(!(n & (n - 1))); assert(1 <= n); assert(n <= 1 << FFT_MAX);
@@ -523,6 +534,14 @@ struct Poly : public vector<Mint> {
     resize(deg() + 1);
     return *this;
   }
+  Poly &operator+=(const Mint fs) {
+    (*this)[0] += fs;
+    return *this;
+  }
+  Poly &operator-=(const Mint fs) {
+    (*this)[0] -= fs;
+    return *this;
+  }
   Poly &operator*=(const Mint &a) {
     for (int i = 0; i < size(); ++i) (*this)[i] *= a;
     return *this;
@@ -543,6 +562,8 @@ struct Poly : public vector<Mint> {
   Poly operator*(const Poly &fs) const { return (Poly(*this) *= fs); }
   Poly operator/(const Poly &fs) const { return (Poly(*this) /= fs); }
   Poly operator%(const Poly &fs) const { return (Poly(*this) %= fs); }
+  Poly operator+(const Mint &fs) const { return (Poly(*this) += fs); }
+  Poly operator-(const Mint &fs) const { return (Poly(*this) -= fs); }
   Poly operator*(const Mint &a) const { return (Poly(*this) *= a); }
   Poly operator/(const Mint &a) const { return (Poly(*this) /= a); }
   friend Poly operator*(const Mint &a, const Poly &fs) { return fs * a; }
@@ -696,6 +717,20 @@ struct Poly : public vector<Mint> {
       fft(polyWork1 + m, m);  // (floor(log_2 k) - ceil(log_2 |f|)) E(|f|)
     }
   }
+
+
+  Poly D() const {
+    Poly f(max(size() - 1, 1));
+    for (int i = 1; i < size(); ++i) f[i - 1] = i * (*this)[i];
+    return f;
+  }
+
+  Poly I() const {
+    Poly f(size() + 1);
+    for (int i = 0; i < size(); ++i) f[i + 1] = ::inv[i + 1] * (*this)[i];
+    return f;
+  }
+
   Poly log(int n) const {
     assert(!empty()); assert((*this)[0].x == 1U); assert(n <= LIM_INV);
     Poly fs = mod(n);
@@ -994,133 +1029,32 @@ struct SubproductTree {
 };
 
 
-namespace lastweapon {
-
-namespace NT{
-inline LL gcd(LL a, LL b){return b?gcd(b,a%b):a;}
-inline LL lcm(LL a, LL b){return a*b/gcd(a,b);}
-
-inline void INC(int &a, int b){a += b; if (a >= MOD) a -= MOD;}
-inline int sum(int a, int b){a += b; if (a >= MOD) a -= MOD; return a;}
-
-inline void DEC(int &a, int b){a -= b; if (a < 0) a += MOD;}
-inline int dff(int a, int b){a -= b; if (a < 0) a  += MOD; return a;}
-inline void MUL(int &a, int b){a = (LL)a * b % MOD;}
-inline int pdt(int x,int y) {
-    int ret; __asm__ __volatile__ ("\tmull %%ebx\n\tdivl %%ecx\n":"=d"(ret):"a"(x),"b"(y),"c"(MOD));
-    return ret;
-}
-
-
-inline int gcd(int m, int n, int &x, int &y){
-
-    x = 1, y = 0; int xx = 0, yy = 1, q;
-
-    while (1){
-        q = m / n, m %= n;
-        if (!m){x = xx, y = yy; return n;}
-        DEC(x, pdt(q, xx)), DEC(y, pdt(q, yy));
-        q = n / m, n %= m;
-        if (!n) return m;
-        DEC(xx, pdt(q, x)), DEC(yy, pdt(q, y));
-    }
-}
-
-inline int sum(int a, int b, int c){return sum(a, sum(b, c));}
-inline int sum(int a, int b, int c, int d){return sum(sum(a, b), sum(c, d));}
-inline int pdt(int a, int b, int c){return pdt(a, pdt(b, c));}
-inline int pdt(int a, int b, int c, int d){return pdt(pdt(a, b), pdt(c, d));}
-
-inline int pow(int a, LL b){
-    int c(1); while (b){
-        if (b&1) MUL(c, a);
-        MUL(a, a), b >>= 1;
-    }
-    return c;
-}
-
-template<class T> inline T pow(T a, LL b){
-    T c(1); while (b){
-        if (b&1) c *= a;
-        a *= a, b >>= 1;
-    }
-    return c;
-}
-
-template<class T> inline T pow(T a, int b){
-    return pow(a, (LL)b);
-}
-
-inline int _I(int b){
-    int a = MOD, x1 = 0, x2 = 1, q; while (1){
-        q = a / b, a %= b;
-        if (!a) return x2;
-        DEC(x1, pdt(q, x2));
-
-        q = b / a, b %= a;
-        if (!b) return x1;
-        DEC(x2, pdt(q, x1));
-    }
-}
-
-inline void DIV(int &a, int b){MUL(a, _I(b));}
-inline int qtt(int a, int b){return pdt(a, _I(b));}
-
-struct Int{
-    int val;
-
-    operator int() const{return val;}
-
-    Int(int _val = 0):val(_val){
-        val %= MOD; if (val < 0) val += MOD;
-    }
-    Int(LL _val):val(_val){
-        _val %= MOD; if (_val < 0) _val += MOD;
-        val = _val;
-    }
-
-    Int& operator +=(const int& rhs){INC(val, rhs);rTs;}
-    Int operator +(const int& rhs) const{return sum(val, rhs);}
-    Int& operator -=(const int& rhs){DEC(val, rhs);rTs;}
-    Int operator -(const int& rhs) const{return dff(val, rhs);}
-    Int& operator *=(const int& rhs){MUL(val, rhs);rTs;}
-    Int operator *(const int& rhs) const{return pdt(val, rhs);}
-    Int& operator /=(const int& rhs){DIV(val, rhs);rTs;}
-    Int operator /(const int& rhs) const{return qtt(val, rhs);}
-    Int operator-()const{return MOD-*this;}
-};
-
-} using namespace NT;//}
-
-}  // namespace lastweapon
-
 using namespace lastweapon;
 
-const int N = int(1e2) + 9;
+Poly H, HH;
+int n;
 
 LL C2(LL n) {
     return n*(n-1)/2;
 }
 
-int main() {
-#ifndef ONLINE_JUDGE
-    //freopen("in.txt", "r", stdin);
-#endif
-    int n; RD(n)++;
-
-    Poly F(n); Mint i2 = invFac[2];
-
-    FOR(i, 1, n) {
-        F[i] = invFac[i] * pow(i2, C2(i));
-        if (i&1) F[i] = -F[i];
-    }
-
-    F[0] += 1; F = F.inv(n);
-    REP_1(i, n) F[i] *= pow(Mint(2), C2(i));
-    F = F.log(n);
-
-    --n;
-    REP_1(i, n) {
-        cout << F[i] * fac[i] << endl;
-    }
+int b(int n) {
+    --n; if (!n) return 1;
+    Poly A(n); REP(i, n) A[i] = H[i] * -n;
+    Poly B = HH.mod(n) * A.exp(n); --n;
+    return (B[n] * fac[n]).x;
 }
+
+int main(){
+
+#ifndef ONLINE_JUDGE
+    freopen("in.txt", "r", stdin);
+#endif
+
+    vector<int> q; DO(5) q.PB(RD()); n = *max_element(ALL(q)) + 1;
+    Poly C(n), G(n); REP(i, n) G[i] = Mint(2).pow(C2(i)), G[i] *= invFac[i]; C = G.log(n);
+    H = C.D().log(n); HH = H.D();
+
+    for (auto i: q) printf("%d\n", b(i));
+}
+
