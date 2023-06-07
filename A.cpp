@@ -1,16 +1,15 @@
 #include <lastweapon/io>
-#include <lastweapon/maxflow>
+#include <lastweapon/dijkstra>
 
 using namespace lastweapon;
 
-int n;
+int n, s, t;
 
 int id(int x, int y) {
+    if (x == -1 || y == n) return s;
+    if (x == n || y == -1) return t;
     return x*n + y;
 }
-
-const int N = int(5e2) + 9;
-int R[N][N], S[N][N];
 
 int main() {
 
@@ -19,12 +18,12 @@ int main() {
     //freopen("/Users/minakokojima/Documents/GitHub/ACM-Training/Workspace/out.txt", "w", stdout);
 #endif
 
-    RD(n); ++n; int s=0, t=n*n; mf_graph<int> G(t--);
+    RD(n); s=n*n; t=s+1; sp_graph<int> G(t+1);
 
-    REP(x, n) REP(y, n-1) RD(R[x][y]);
-    REP(x, n-1) REP(y, n) RD(S[x][y]);
-    REP(x, n) REP(y, n-1) G.add_edge(id(x,y), id(x,y+1), R[x][y], RD());
-    REP(x, n-1) REP(y, n) G.add_edge(id(x,y), id(x+1,y), S[x][y], RD());
+    REP(x, n+1) REP(y, n) G.add_edge(id(x-1,y), id(x,y), RD());
+    REP(x, n) REP(y, n+1) G.add_edge(id(x,y), id(x,y-1), RD());
+    REP(x, n+1) REP(y, n) G.add_edge(id(x,y), id(x-1,y), RD());
+    REP(x, n) REP(y, n+1) G.add_edge(id(x,y-1), id(x,y), RD());
 
-    cout << G.flow(s, t) << endl;
+    cout << G.dijkstra(s, t) << endl;
 }
