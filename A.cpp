@@ -1,29 +1,30 @@
-#include <lastweapon/poly>
+#include <lastweapon/io>
+#include <lastweapon/maxflow>
+
 using namespace lastweapon;
 
-Poly H, HH;
 int n;
 
-LL C2(LL n) {
-    return n*(n-1)/2;
+int id(int x, int y) {
+    return x*n + y;
 }
 
-int b(int n) {
-    --n; if (!n) return 1;
-    Poly A(n); REP(i, n) A[i] = H[i] * -n;
-    Poly B = HH.mod(n) * A.exp();
-    return (B[n-1] * fac[n-1]).x;
-}
+const int N = int(5e2) + 9;
+int R[N][N], S[N][N];
 
-int main(){
+int main() {
 
 #ifndef ONLINE_JUDGE
     freopen("in.txt", "r", stdin);
+    //freopen("/Users/minakokojima/Documents/GitHub/ACM-Training/Workspace/out.txt", "w", stdout);
 #endif
 
-    vector<int> q; DO(5) q.PB(RD()); n = *max_element(ALL(q)) + 1;
-    Poly C(n), G(n); REP(i, n) G[i] = Mint(2).pow(C2(i)), G[i] *= invFac[i]; C = G.log();
-    H = C.D().log(); HH = H.D();
+    RD(n); ++n; int s=0, t=n*n; mf_graph<int> G(t--);
 
-    for (auto i: q) printf("%d\n", b(i));
+    REP(x, n) REP(y, n-1) RD(R[x][y]);
+    REP(x, n-1) REP(y, n) RD(S[x][y]);
+    REP(x, n) REP(y, n-1) G.add_edge(id(x,y), id(x,y+1), R[x][y], RD());
+    REP(x, n-1) REP(y, n) G.add_edge(id(x,y), id(x+1,y), S[x][y], RD());
+
+    cout << G.flow(s, t) << endl;
 }

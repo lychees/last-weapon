@@ -30,6 +30,20 @@ template <class Cap> struct mf_graph {
         return m;
     }
 
+    int add_edge(int from, int to, Cap c1, Cap c2) {
+        assert(0 <= from && from < _n);
+        assert(0 <= to && to < _n);
+        assert(0 <= c1); assert(0 <= c2);
+        int m = int(pos.size());
+        pos.push_back({from, int(g[from].size())});
+        int from_id = int(g[from].size());
+        int to_id = int(g[to].size());
+        if (from == to) to_id++;
+        g[from].push_back(_edge{to, to_id, c1});
+        g[to].push_back(_edge{from, from_id, c2});
+        return m;
+    }
+
     struct edge {
         int from, to;
         Cap cap, flow;
