@@ -89,9 +89,10 @@ template <class Cap, class Cost> struct mcf_graph {
         return result;
     }
 
-  private:
     int _n;
     std::vector<edge> _edges;
+
+  private:
 
     // inside edge
     struct _edge {

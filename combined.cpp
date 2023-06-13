@@ -412,9 +412,10 @@ template <class Cap, class Cost> struct mcf_graph {
         return result;
     }
 
-  private:
     int _n;
     std::vector<edge> _edges;
+
+  private:
 
     struct _edge {
         int to, rev;
@@ -525,6 +526,9 @@ template <class Cap, class Cost> struct mcf_graph {
 
 using namespace lastweapon;
 
+const int N = 40, M = 100;
+int cost[N][M], last[N][M], cnt[N][M];
+
 int main() {
 
 #ifndef ONLINE_JUDGE
@@ -533,14 +537,20 @@ int main() {
 #endif
 
     int n, m, p; RD(n, m); p = 800; int s = n+m*p, t = s+1, nn = 0;
-    mcf_graph<int, int> G(t+1);
+    mcf_graph<int, int> G(t+1); int pn = 0;
 
-    REP(i, n) G.add_edge(s, i, RD(), 0);
+    REP(i, n) G.add_edge(s, i, pn += RD(), 0);
     REP(i, p) REP(j, m) G.add_edge(n+p*j+i, t, 1, 0);
 
-    REP(i, n) REP(j, m) {
-        int c; RD(c); REP(k, p) G.add_edge(i, n+p*j+k, 1, (k+1)*c);
-    }
+    REP(i, n) REP(j, m) last[i][j] = G.add_edge(i, n+p*j, 1, RD(cost[i][j]));
+
+    /*REP_1(pi, pn-1) {
+        G.slope(s, t, pi);
+        REP(i, n) REP(j, m) if (G._edges[last[i][j]].flow == 1) {
+            ++cnt[i][j];
+            last[i][j] = G.add_edge(i, n+p*j+cnt[i][j], 1, (cnt[i][j]+1)*cost[i][j]);
+        }
+    }*/
 
     printf("%d\n", G.flow(s, t).se);
 }
