@@ -21,3 +21,4 @@
 #include "lastweapon/geometry"
 #include "lastweapon/poly"
 #include "lastweapon/dijkstra"
+#include "lastweapon/mincostflow2"
