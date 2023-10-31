@@ -1,152 +1,86 @@
 #include <lastweapon/io>
 #include <lastweapon/fenwicktree>
-
+#pragma comment(linker, "/STACK:36777216")
 using namespace lastweapon;
+const int N = int(3e3) + 9;
+char col[N][N];
+bool vis[N][N]; int  tim[N][N];
+int n, m, zz, qq, tt, z, xx0, yy0;
 
-const int N = int(1e6) + 9;
-int A[N], B[N], R[N]; VI P;
+map<PII, int> H;
 
-struct rec {
-    int l, r, v;
-    void in() {
-        RD(l, r, v);
-        A[l] = v;
-        FOR_1(i, l+1, r) checkMax(B[i], v);
-        P.PB(v);
-    }
-    bool operator <(const rec& r) const {
-        return l > r.l;
-    }
-} I[N];
-
-const int TN = 4*N;
-
-#define lx (x<<1)
-#define rx (lx|1)
-#define ml ((l+r)>>1)
-#define mr (ml+1)
-#define lc lx,l,ml
-#define rc rx,mr,r
-#define rt 1,0,SZ(P)-1
-
-struct SegTree{;
-
-    struct Tnode {
-        int key, pos;
-        Tnode (int _key = 0, int _pos = 0):key(_key), pos(_pos){}
-        bool operator <(const Tnode& r) const {
-            return key < r.key || key == r.key && pos < r.pos;
-        }
-    } T[TN]; int D[N];
-
-    void upd(int x) {
-        T[x] = min(T[lx], T[rx]);
-    }
-
-    void add(int x, int d) {
-        T[x].key += d;
-        D[x] += d;
-    }
-
-    void rls(int x) {
-        if (D[x]) {
-            add(lx, D[x]);
-            add(rx, D[x]);
-            D[x] = 0;
-        }
-    }
-
-    void Build(int x, int l, int r) {
-        T[x].key = 0, T[x].pos = l; D[x] = 0;
-        if (l < r) Build(lc), Build(rc);
-    }
-
-    Tnode Query(int x, int l, int r, const int a, const int b) {
-        if (b < l || r < a) return {INF, -1};
-        if (a <= l && r <= b) {
-            return T[x];
-        } else {
-            rls(x);
-            return min(Query(lc, a, b), Query(rc, a, b));
-        }
-    }
-
-    void Add(int x, int l, int r, const int a, const int b, const int d) {
-        if (b < l || r < a) return;
-        if (a <= l && r <= b) {
-            add(x, d);
-        } else {
-            rls(x);
-            Add(lc, a, b, d); Add(rc, a, b, d);
-            upd(x);
-        }
-    }
-} T;
-
-int n, m;
-
-int Find(int x){
-    return R[x] == x ? x : R[x] = Find(R[x]);
+bool inGrid(int x, int y) {
+    return 0 <= x && x < n && 0 <= y && y < m;
 }
 
+int qx[N*N], qy[N*N];
 
-LL solve() {
-    RD(n, m); fill(A+1, A+n+1, -1); fill(B+1, B+n+1, -1); P.clear();
+void bfs(int x, int y) {
+    int cz = 0, op = 1;
+    qx[0] = x, qy[0] = y;
+    zz += 1;
+    vis[x][y] = 1;
 
-    REP(i, m) I[i].in(); UNQ(P);
+    while (cz < op) {
+     x = qx[cz]; y = qy[cz]; ++ cz;
+    REP(i, 4) {
+        int xx = x + dx[i];
+        int yy = y + dy[i];
+        if (!inGrid(xx, yy)) continue;
+        if (vis[xx][yy]) continue;
+        if (col[xx][yy] == '.') {
+            if (tim[xx][yy] != tt) {
+                    //cout << "   " << xx << " " << yy << " " << tt << " " << tim[xx][yy] << endl;
+                qq += 1;
+                tim[xx][yy] = tt;
+                xx0 = xx; yy0 = yy;
+            //cout << "   " << xx << " " << yy << " " << tt << " " << tim[xx][yy] << endl;
+            }
+        } else if (col[xx][yy] == 'W') {
+            //dfs(xx, yy);
+            vis[xx][yy] = 1;
+            qx[op] = xx;
+            qy[op] = yy;
+            ++op;
+        }
+    }
 
-    vector<vector<rec>> buc(SZ(P));
-    REP(i, m) buc[LBD(P, I[i].v)].PB(I[i]);
+    }
+}
 
-    m = SZ(P);
+int gao() {
+    RD(n, m); H.clear();
+    REP(i, n) RS(col[i]), fill(vis[i], vis[i] + m, 0);
+    z = 0;
 
-    REP_1(i, n+1) R[i] = i;
-
-    DWN(i, m, 0) {
-        SRT(buc[i]); set<int> P;
-        for (auto t: buc[i]) {
-            while (true) {
-                int p = Find(t.l); if (p > t.r) break;
-                B[p] = i; P.insert(p); R[p] = Find(p+1);
+    REP(i, n) REP(j, m) if (!vis[i][j]){
+        if (col[i][j] == 'W') {
+            zz = 0; qq = 0; ++tt;
+            bfs(i, j);
+            //cout << zz << " " << qq << endl;
+            if (qq == 1) {
+                H[{xx0,yy0}] += zz;
+                checkMax(z, H[{xx0,yy0}]);
             }
         }
-        P.insert(INF); set<int> Q; Q.insert(INF);
-        for (auto t: buc[i]) {
-            int q = *Q.lower_bound(t.l); if (q <= t.r) continue;
-            int p = *P.lower_bound(t.l); if (p > t.r) return -1;
-            A[p] = i; P.erase(p); Q.insert(p);
-        }
     }
-
-    //return -2;
-
-    //REP_1(i, n) if (~A[i]) A[i] = LBD(P, A[i]);
-    //else B[i] = ~B[i] ? LBD(P, B[i]) : 0;
-
-    T.Build(rt); REP_1(i, n) if (~A[i]) T.Add(rt, A[i]+1, m-1, 1);
-
-    REP_1(i, n) {
-        if (~A[i]) T.Add(rt, A[i]+1, m-1, -1);
-        else A[i] = T.Query(rt, B[i], m-1).pos;
-        T.Add(rt, 0, A[i]-1, 1);
-    }
-
-    fenwick_tree<int> T(m);
-    LL z = (LL)n*(n-1)/2; REP_1(i, n) {
-        z -= T.sum(A[i]+1);
-        T.add(A[i], 1);
-    }
+    //cout << z << endl;
     return z;
 }
 
 int main() {
 
+
+
 #ifndef ONLINE_JUDGE
-    freopen("in.txt", "r", stdin);
-    //freopen("/Users/minakokojima/Documents/GitHub/ACM-Training/Workspace/out.txt", "w", stdout);
+    freopen("ready_go_part_2_input.txt", "r", stdin);
+    //freopen("back_in_black_chapter_1_input.txt", "r", stdin);
+    freopen("out.txt", "w", stdout);
 #endif
 
+    //init();
     Rush {
-        cout << solve() << endl;
+        printf("Case #%d: %d\n", ++Case, gao() );
     }
+
 }

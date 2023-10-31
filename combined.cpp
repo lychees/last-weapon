@@ -269,288 +269,496 @@ LL last_ans; int Case; template<class T> inline void OT(const T &x){
     cout << x << endl;
 }
 namespace lastweapon {}
-
-#include <algorithm>
-#include <cassert>
-#include <limits>
-#include <queue>
-#include <vector>
-
-
-#include <algorithm>
-#include <utility>
-#include <vector>
-
 namespace lastweapon {
 namespace internal {
 
-template <class E> struct csr {
-    std::vector<int> start;
-    std::vector<E> elist;
-    explicit csr(int n, const std::vector<std::pair<int, E>>& edges)
-        : start(n + 1), elist(edges.size()) {
-        for (auto e : edges) {
-            start[e.first + 1]++;
+std::vector<int> sa_naive(const std::vector<int>& s) {
+    int n = int(s.size());
+    std::vector<int> sa(n);
+    std::iota(sa.begin(), sa.end(), 0);
+    std::sort(sa.begin(), sa.end(), [&](int l, int r) {
+        if (l == r) return false;
+        while (l < n && r < n) {
+            if (s[l] != s[r]) return s[l] < s[r];
+            l++;
+            r++;
         }
-        for (int i = 1; i <= n; i++) {
-            start[i] += start[i - 1];
+        return l == n;
+    });
+    return sa;
+}
+
+std::vector<int> sa_doubling(const std::vector<int>& s) {
+    int n = int(s.size());
+    std::vector<int> sa(n), rnk = s, tmp(n);
+    std::iota(sa.begin(), sa.end(), 0);
+    for (int k = 1; k < n; k *= 2) {
+        auto cmp = [&](int x, int y) {
+            if (rnk[x] != rnk[y]) return rnk[x] < rnk[y];
+            int rx = x + k < n ? rnk[x + k] : -1;
+            int ry = y + k < n ? rnk[y + k] : -1;
+            return rx < ry;
+        };
+        std::sort(sa.begin(), sa.end(), cmp);
+        tmp[sa[0]] = 0;
+        for (int i = 1; i < n; i++) {
+            tmp[sa[i]] = tmp[sa[i - 1]] + (cmp(sa[i - 1], sa[i]) ? 1 : 0);
         }
-        auto counter = start;
-        for (auto e : edges) {
-            elist[counter[e.first]++] = e.second;
+        std::swap(tmp, rnk);
+    }
+    return sa;
+}
+
+template <int THRESHOLD_NAIVE = 10, int THRESHOLD_DOUBLING = 40>
+std::vector<int> sa_is(const std::vector<int>& s, int upper) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    if (n == 1) return {0};
+    if (n == 2) {
+        if (s[0] < s[1]) {
+            return {0, 1};
+        } else {
+            return {1, 0};
         }
     }
-};
-
-}  // namespace internal
-
-}  // namespace lastweapon
-
-
-#include <vector>
-
-namespace lastweapon {
-
-namespace internal {
-
-template <class T> struct simple_queue {
-    std::vector<T> payload;
-    int pos = 0;
-    void reserve(int n) { payload.reserve(n); }
-    int size() const { return int(payload.size()) - pos; }
-    bool empty() const { return pos == int(payload.size()); }
-    void push(const T& t) { payload.push_back(t); }
-    T& front() { return payload[pos]; }
-    void clear() {
-        payload.clear();
-        pos = 0;
+    if (n < THRESHOLD_NAIVE) {
+        return sa_naive(s);
     }
-    void pop() { pos++; }
-};
-
-}  // namespace internal
-
-}  // namespace lastweapon
-
-
-namespace lastweapon {
-
-template <class Cap, class Cost> struct mcf_graph {
-  public:
-    mcf_graph() {}
-    explicit mcf_graph(int n) : _n(n) {}
-
-    int add_edge(int from, int to, Cap cap, Cost cost) {
-        assert(0 <= from && from < _n);
-        assert(0 <= to && to < _n);
-        assert(0 <= cap);
-        assert(0 <= cost);
-        int m = int(_edges.size());
-        _edges.push_back({from, to, cap, 0, cost});
-        return m;
+    if (n < THRESHOLD_DOUBLING) {
+        return sa_doubling(s);
     }
 
-    struct edge {
-        int from, to;
-        Cap cap, flow;
-        Cost cost;
+    std::vector<int> sa(n);
+    std::vector<bool> ls(n);
+    for (int i = n - 2; i >= 0; i--) {
+        ls[i] = (s[i] == s[i + 1]) ? ls[i + 1] : (s[i] < s[i + 1]);
+    }
+    std::vector<int> sum_l(upper + 1), sum_s(upper + 1);
+    for (int i = 0; i < n; i++) {
+        if (!ls[i]) {
+            sum_s[s[i]]++;
+        } else {
+            sum_l[s[i] + 1]++;
+        }
+    }
+    for (int i = 0; i <= upper; i++) {
+        sum_s[i] += sum_l[i];
+        if (i < upper) sum_l[i + 1] += sum_s[i];
+    }
+
+    auto induce = [&](const std::vector<int>& lms) {
+        std::fill(sa.begin(), sa.end(), -1);
+        std::vector<int> buf(upper + 1);
+        std::copy(sum_s.begin(), sum_s.end(), buf.begin());
+        for (auto d : lms) {
+            if (d == n) continue;
+            sa[buf[s[d]]++] = d;
+        }
+        std::copy(sum_l.begin(), sum_l.end(), buf.begin());
+        sa[buf[s[n - 1]]++] = n - 1;
+        for (int i = 0; i < n; i++) {
+            int v = sa[i];
+            if (v >= 1 && !ls[v - 1]) {
+                sa[buf[s[v - 1]]++] = v - 1;
+            }
+        }
+        std::copy(sum_l.begin(), sum_l.end(), buf.begin());
+        for (int i = n - 1; i >= 0; i--) {
+            int v = sa[i];
+            if (v >= 1 && ls[v - 1]) {
+                sa[--buf[s[v - 1] + 1]] = v - 1;
+            }
+        }
     };
 
-    edge get_edge(int i) {
-        int m = int(_edges.size());
-        assert(0 <= i && i < m);
-        return _edges[i];
+    std::vector<int> lms_map(n + 1, -1);
+    int m = 0;
+    for (int i = 1; i < n; i++) {
+        if (!ls[i - 1] && ls[i]) {
+            lms_map[i] = m++;
+        }
     }
-    std::vector<edge> edges() { return _edges; }
+    std::vector<int> lms;
+    lms.reserve(m);
+    for (int i = 1; i < n; i++) {
+        if (!ls[i - 1] && ls[i]) {
+            lms.push_back(i);
+        }
+    }
 
-    std::pair<Cap, Cost> flow(int s, int t) {
-        return flow(s, t, std::numeric_limits<Cap>::max());
-    }
-    std::pair<Cap, Cost> flow(int s, int t, Cap flow_limit) {
-        return slope(s, t, flow_limit).back();
-    }
-    std::vector<std::pair<Cap, Cost>> slope(int s, int t) {
-        return slope(s, t, std::numeric_limits<Cap>::max());
-    }
-    std::vector<std::pair<Cap, Cost>> slope(int s, int t, Cap flow_limit) {
-        assert(0 <= s && s < _n);
-        assert(0 <= t && t < _n);
-        assert(s != t);
+    induce(lms);
 
-        int m = int(_edges.size());
-        std::vector<int> edge_idx(m);
-
-        auto g = [&]() {
-            std::vector<int> degree(_n), redge_idx(m);
-            std::vector<std::pair<int, _edge>> elist;
-            elist.reserve(2 * m);
-            for (int i = 0; i < m; i++) {
-                auto e = _edges[i];
-                edge_idx[i] = degree[e.from]++;
-                redge_idx[i] = degree[e.to]++;
-                elist.push_back({e.from, {e.to, -1, e.cap - e.flow, e.cost}});
-                elist.push_back({e.to, {e.from, -1, e.flow, -e.cost}});
+    if (m) {
+        std::vector<int> sorted_lms;
+        sorted_lms.reserve(m);
+        for (int v : sa) {
+            if (lms_map[v] != -1) sorted_lms.push_back(v);
+        }
+        std::vector<int> rec_s(m);
+        int rec_upper = 0;
+        rec_s[lms_map[sorted_lms[0]]] = 0;
+        for (int i = 1; i < m; i++) {
+            int l = sorted_lms[i - 1], r = sorted_lms[i];
+            int end_l = (lms_map[l] + 1 < m) ? lms[lms_map[l] + 1] : n;
+            int end_r = (lms_map[r] + 1 < m) ? lms[lms_map[r] + 1] : n;
+            bool same = true;
+            if (end_l - l != end_r - r) {
+                same = false;
+            } else {
+                while (l < end_l) {
+                    if (s[l] != s[r]) {
+                        break;
+                    }
+                    l++;
+                    r++;
+                }
+                if (l == n || s[l] != s[r]) same = false;
             }
-            auto _g = internal::csr<_edge>(_n, elist);
-            for (int i = 0; i < m; i++) {
-                auto e = _edges[i];
-                edge_idx[i] += _g.start[e.from];
-                redge_idx[i] += _g.start[e.to];
-                _g.elist[edge_idx[i]].rev = redge_idx[i];
-                _g.elist[redge_idx[i]].rev = edge_idx[i];
-            }
-            return _g;
-        }();
+            if (!same) rec_upper++;
+            rec_s[lms_map[sorted_lms[i]]] = rec_upper;
+        }
 
-        auto result = slope(g, s, t, flow_limit);
+        auto rec_sa =
+            sa_is<THRESHOLD_NAIVE, THRESHOLD_DOUBLING>(rec_s, rec_upper);
 
         for (int i = 0; i < m; i++) {
-            auto e = g.elist[edge_idx[i]];
-            _edges[i].flow = _edges[i].cap - e.cap;
+            sorted_lms[i] = lms[rec_sa[i]];
         }
-
-        return result;
+        induce(sorted_lms);
     }
+    return sa;
+}
 
-    int _n;
-    std::vector<edge> _edges;
+}  // namespace internal
 
-  private:
+std::vector<int> suffix_array(const std::vector<int>& s, int upper) {
+    assert(0 <= upper);
+    for (int d : s) {
+        assert(0 <= d && d <= upper);
+    }
+    auto sa = internal::sa_is(s, upper);
+    return sa;
+}
 
-    struct _edge {
-        int to, rev;
-        Cap cap;
-        Cost cost;
-    };
+template <class T> std::vector<int> suffix_array(const std::vector<T>& s) {
+    int n = int(s.size());
+    std::vector<int> idx(n);
+    iota(idx.begin(), idx.end(), 0);
+    sort(idx.begin(), idx.end(), [&](int l, int r) { return s[l] < s[r]; });
+    std::vector<int> s2(n);
+    int now = 0;
+    for (int i = 0; i < n; i++) {
+        if (i && s[idx[i - 1]] != s[idx[i]]) now++;
+        s2[idx[i]] = now;
+    }
+    return internal::sa_is(s2, now);
+}
 
-    std::vector<std::pair<Cap, Cost>> slope(internal::csr<_edge>& g,
-                                            int s,
-                                            int t,
-                                            Cap flow_limit) {
+std::vector<int> suffix_array(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return internal::sa_is(s2, 255);
+}
 
-        std::vector<std::pair<Cost, Cost>> dual_dist(_n);
-        std::vector<int> prev_e(_n);
-        std::vector<bool> vis(_n);
-        struct Q {
-            Cost key;
-            int to;
-            bool operator<(Q r) const { return key > r.key; }
-        };
-        std::vector<int> que_min;
-        std::vector<Q> que;
-        auto dual_ref = [&]() {
-            for (int i = 0; i < _n; i++) {
-                dual_dist[i].second = std::numeric_limits<Cost>::max();
-            }
-            std::fill(vis.begin(), vis.end(), false);
-            que_min.clear();
-            que.clear();
-
-            size_t heap_r = 0;
-
-            dual_dist[s].second = 0;
-            que_min.push_back(s);
-            while (!que_min.empty() || !que.empty()) {
-                int v;
-                if (!que_min.empty()) {
-                    v = que_min.back();
-                    que_min.pop_back();
-                } else {
-                    while (heap_r < que.size()) {
-                        heap_r++;
-                        std::push_heap(que.begin(), que.begin() + heap_r);
-                    }
-                    v = que.front().to;
-                    std::pop_heap(que.begin(), que.end());
-                    que.pop_back();
-                    heap_r--;
-                }
-                if (vis[v]) continue;
-                vis[v] = true;
-                if (v == t) break;
-                Cost dual_v = dual_dist[v].first, dist_v = dual_dist[v].second;
-                for (int i = g.start[v]; i < g.start[v + 1]; i++) {
-                    auto e = g.elist[i];
-                    if (!e.cap) continue;
-                    Cost cost = e.cost - dual_dist[e.to].first + dual_v;
-                    if (dual_dist[e.to].second - dist_v > cost) {
-                        Cost dist_to = dist_v + cost;
-                        dual_dist[e.to].second = dist_to;
-                        prev_e[e.to] = e.rev;
-                        if (dist_to == dist_v) {
-                            que_min.push_back(e.to);
-                        } else {
-                            que.push_back(Q{dist_to, e.to});
-                        }
-                    }
-                }
-            }
-            if (!vis[t]) {
-                return false;
-            }
-
-            for (int v = 0; v < _n; v++) {
-                if (!vis[v]) continue;
-                dual_dist[v].first -= dual_dist[t].second - dual_dist[v].second;
-            }
-            return true;
-        };
-        Cap flow = 0;
-        Cost cost = 0, prev_cost_per_flow = -1;
-        std::vector<std::pair<Cap, Cost>> result = {{Cap(0), Cost(0)}};
-        while (flow < flow_limit) {
-            if (!dual_ref()) break;
-            Cap c = flow_limit - flow;
-            for (int v = t; v != s; v = g.elist[prev_e[v]].to) {
-                c = std::min(c, g.elist[g.elist[prev_e[v]].rev].cap);
-            }
-            for (int v = t; v != s; v = g.elist[prev_e[v]].to) {
-                auto& e = g.elist[prev_e[v]];
-                e.cap += c;
-                g.elist[e.rev].cap -= c;
-            }
-            Cost d = -dual_dist[s].first;
-            flow += c;
-            cost += c * d;
-            if (prev_cost_per_flow == d) {
-                result.pop_back();
-            }
-            result.push_back({flow, cost});
-            prev_cost_per_flow = d;
+template <class T>
+std::vector<int> lcp_array(const std::vector<T>& s,
+                           const std::vector<int>& sa) {
+    int n = int(s.size());
+    assert(n >= 1);
+    std::vector<int> rnk(n);
+    for (int i = 0; i < n; i++) {
+        rnk[sa[i]] = i;
+    }
+    std::vector<int> lcp(n - 1);
+    int h = 0;
+    for (int i = 0; i < n; i++) {
+        if (h > 0) h--;
+        if (rnk[i] == 0) continue;
+        int j = sa[rnk[i] - 1];
+        for (; j + h < n && i + h < n; h++) {
+            if (s[j + h] != s[i + h]) break;
         }
-        return result;
+        lcp[rnk[i] - 1] = h;
     }
-};
+    return lcp;
+}
 
-}  // namespace atcoder
+std::vector<int> lcp_array(const std::string& s, const std::vector<int>& sa) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return lcp_array(s2, sa);
+}
+
+template <class T> std::vector<int> z_algorithm(const std::vector<T>& s) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    std::vector<int> z(n);
+    z[0] = 0;
+    for (int i = 1, j = 0; i < n; i++) {
+        int& k = z[i];
+        k = (j + z[j] <= i) ? 0 : std::min(j + z[j] - i, z[i - j]);
+        while (i + k < n && s[k] == s[i + k]) k++;
+        if (j + z[j] < i + z[i]) j = i;
+    }
+    z[0] = n;
+    return z;
+}
+
+std::vector<int> z_algorithm(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return z_algorithm(s2);
+}
+
+template <class T> std::vector<int> kmp(const std::vector<T>& s) {
+    int n = int(s.size());
+    if (n == 0) return {};
+    std::vector<int> pi(n);
+    pi[0] = -1;
+    for (int i = 1, j = -1; i < n; i++) {
+        while (j >= 0 && s[i] != s[j+1]) j = pi[j];
+        if (s[i] == s[j+1]) ++j;
+        pi[i] = j;
+    }
+    return pi;
+}
+
+std::vector<int> kmp(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> s2(n);
+    for (int i = 0; i < n; i++) {
+        s2[i] = s[i];
+    }
+    return kmp(s2);
+}
+
+template <class T> std::vector<int> manacher(const std::vector<T>& ss) {
+    int nn = int(ss.size());
+    if (nn == 0) return {};
+    int n = 2*nn+2;
+    std::vector<T> s(n+1);
+    s[0] = '$';
+    for(int i = 0; i < nn; i++) {
+        s[i*2+1] = '.';
+        s[i*2+2] = ss[i];
+    }
+    s[n-1] = '.';
+    s[n] = 0;
+    std::vector<int> r(n);
+    r[0] = 0;
+    int mx = 0, mi = 0;
+    for (int i = 1; i < n; i++) {
+        for (r[i]=mx>i?std::min(r[2*mi-i],mx-i):1;s[i+r[i]]==s[i-r[i]];++r[i]);
+        if (i+r[i]>mx)mx=i+r[i],mi=i;
+    }
+    return r;
+}
+
+std::vector<int> manacher(const std::string& s) {
+    int n = int(s.size());
+    std::vector<int> ss(n);
+    for (int i = 0; i < n; i++) {
+        ss[i] = s[i];
+    }
+    return manacher(ss);
+}
+
+}  // namespace lastweapon
+
 
 using namespace lastweapon;
 
-const int N = 40, M = 100;
-int cost[N][M], last[N][M], cnt[N][M];
+PII operator +(PII a, PII b){
+    return MP(a.fi+b.fi,a.se+b.se);
+}
+
+const int N = int(2e6) + 9;
+const int NN = 4*N;
+
+struct SegTree {
+#define lx (x<<1)
+#define rx (lx|1)
+#define ml ((l+r)>>1)
+#define mr (ml+1)
+#define lc lx,l,ml
+#define rc rx,mr,r
+
+    int sum[NN], cnt[NN];
+    bool clr[NN];
+
+    void upd(int x) {
+        sum[x] = sum[lx] + sum[rx];
+        cnt[x] = cnt[lx] + cnt[rx];
+    }
+    void cln(int x) {
+        cnt[x] = sum[x] = 0;
+        clr[x] = 1;
+    }
+
+    void rls(int x) {
+        if (clr[x]) {
+            cln(lx); cln(rx);
+            clr[x] = 0;
+        }
+    }
+
+    void Add(int x, int l, int r, int p, int d = 1) {
+        //return;
+        if (l == r) {
+            if (d == 1) {
+                cnt[x] += 1;
+                sum[x] += l;
+            } else {
+                cnt[x] -= 1;
+                sum[x] -= l;
+            }
+        } else {
+            rls(x);
+            if (p < mr) Add(lc, p);
+            else Add(rc, p);
+            upd(x);
+        }
+    }
+
+    pair<int, int> Query(int x, int l, int r, int p) {
+        if (p < l) return MP(0, 0);
+        if (l == r) return MP(cnt[x], sum[x]);
+        rls(x);
+        return (ml <= p ? MP(cnt[lx], sum[lx]) : Query(lc, p)) + Query(rc, p);
+    }
+#undef lx
+#undef rx
+#undef ml
+#undef mr
+#undef lc
+#undef rc
+} T;
+
+
+// https://oi-wiki.org/ds/cartesian-tree/
+namespace Cartesian_tree{
+    VI a,l,r,ll,rr,sz; set<int> S;
+
+    int n;
+
+    #define lx l[x]
+    #define rx r[x]
+    #define y sta.top()
+    #define ly l[y]
+    #define ry r[y]
+
+    int init(VI h) {
+        S.clear();
+        CLR(a,l,r,ll,rr,sz); n = SZ(h); a.resize(n+1); l.resize(n+1), r.resize(n+1), sz.resize(n+1);
+        ll.resize(n+1); rr.resize(n+1);
+
+        REP(i, n+1) r[i] = l[i] = 0;
+        REP_1(i, n) a[i] = h[i-1], ll[i] = rr[i] = i;
+        a[0] = -1;
+
+        FOR_1(x, 0, n) rx = 0;
+        stack<int> sta; sta.push(0);
+
+        REP_1(x, n) {
+            while (a[y] > a[x]) sta.pop();
+            lx = ry; ry = x; sta.push(x);
+        }
+        return r[0];
+    }
+
+    void dfs0(int x) {
+        if (!x) return;
+        dfs0(lx); dfs0(rx);
+        sz[x] = sz[lx] + sz[rx] + 1;
+        if (lx) ll[x] = ll[lx];
+        if (rx) rr[x] = rr[rx];
+    }
+
+    void ins(int x) {
+        auto r = S.upper_bound(x);
+        if (!(r == S.end() || r == S.begin())) {
+            auto l = r; --l;
+            T.Add(1,1,n,*r - *l, -1);
+        }
+        auto t = S.insert(x).fi;
+        if (t != S.begin()) {
+            --t;
+            T.Add(1,1,n,x - *t);
+            ++t;
+        }
+        ++t;
+        if (t != S.end()) {
+            T.Add(1,1,n,*t - x);
+        }
+    }
+
+    void dfs(int x, const VI& sa, bool big, pair<int, pair<int, PII>>& z) {
+        if (!x) return;
+
+        if (sz[lx] > sz[rx]) {
+            dfs(rx, sa, false, z);
+            dfs(lx, sa, true, z);
+            if (rx) FOR_1(i, x+1, rr[x]) ins(sa[i]);
+        } else {
+            dfs(lx, sa, false, z);
+            dfs(rx, sa, true, z);
+            if (lx) FOR(i, ll[lx]-1, x-1) ins(sa[i]);
+        }
+
+        ins(sa[x-1]); ins(sa[x]);
+
+        int l0 = *S.begin();
+        int r0 = *S.rbegin();
+        assert(sz[x] == rr[x] - ll[x] + 1);
+
+        PII qry = T.Query(1,1,n,a[x]);
+        int len = (SZ(S) - qry.fi) * a[x] + qry.se;
+
+        int width = sz[x] + 1;
+        assert(len <= width*a[x]);
+
+        checkMax(z, make_pair(len, make_pair(-a[x], make_pair(l0, width))));
+
+        if (!big) {
+            S.clear();
+            T.cln(1);
+        }
+    }
+    #undef lx
+    #undef rx
+    #undef y
+    #undef ly
+    #undef ry
+}
+
+char s[N];
 
 int main() {
+    Rush {
+        RS(s); VI sa = suffix_array(s);
+        VI h = lcp_array(s, sa);
+        int rt = Cartesian_tree::init(h);
+        pair<int, pair<int, PII>> z = {0, {0, {0, 0}}};
+        Cartesian_tree::dfs0(rt);
+        T.cln(1);
+        Cartesian_tree::dfs(rt, sa, true, z);
 
-#ifndef ONLINE_JUDGE
-    freopen("in.txt", "r", stdin);
-    //freopen("out.txt", "w", stdout);
-#endif
-
-    int n, m, p; RD(n, m); p = 800; int s = n+m*p, t = s+1, nn = 0;
-    mcf_graph<int, int> G(t+1); int pn = 0;
-
-    REP(i, n) G.add_edge(s, i, pn += RD(), 0);
-    REP(i, p) REP(j, m) G.add_edge(n+p*j+i, t, 1, 0);
-
-    REP(i, n) REP(j, m) last[i][j] = G.add_edge(i, n+p*j, 1, RD(cost[i][j]));
-
-    /*REP_1(pi, pn-1) {
-        G.slope(s, t, pi);
-        REP(i, n) REP(j, m) if (G._edges[last[i][j]].flow == 1) {
-            ++cnt[i][j];
-            last[i][j] = G.add_edge(i, n+p*j+cnt[i][j], 1, (cnt[i][j]+1)*cost[i][j]);
+        cout << z.fi;
+        if (z.fi > 1) {
+            putchar(' ');
+            int a = z.se.se.fi;
+            int b = z.se.se.fi-z.se.fi;
+            FOR(i, a, b) putchar(s[i]);
         }
-    }*/
-
-    printf("%d\n", G.flow(s, t).se);
+        puts("");
+    }
 }
